@@ -1,0 +1,41 @@
+## .NET / Visual Studio
+bin/
+obj/
+[Bb]uild/
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Ll]og/
+[Ll]ogs/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+*.rsuser
+project.lock.json
+artifacts/
+*.nupkg
+*.snupkg
+**/packages/*
+*.DotSettings.user
+
+## Rider
+.idea/
+
+## OS
+.DS_Store
+Thumbs.db
+
+## Local DB (optional — remove line if you want to commit dev DB)
+*.db
+*.db-shm
+*.db-wal
+
+## Secrets
+appsettings.*.local.json
+secrets.json
