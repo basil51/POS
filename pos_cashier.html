@@ -1,0 +1,1077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartPOS — Cashier</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --green: #16a34a;
+    --green-dark: #15803d;
+    --green-light: #f0fdf4;
+    --green-mid: #dcfce7;
+    --sidebar-w: 72px;
+    --cart-w: 380px;
+    --topbar-h: 56px;
+    --bg: #f5f5f4;
+    --surface: #ffffff;
+    --border: #e7e5e4;
+    --border-strong: #d6d3d1;
+    --text: #1c1917;
+    --text-muted: #78716c;
+    --text-faint: #a8a29e;
+    --red: #dc2626;
+    --red-light: #fef2f2;
+    --amber: #d97706;
+    --amber-light: #fffbeb;
+    --blue: #2563eb;
+    --blue-light: #eff6ff;
+    --radius: 10px;
+    --radius-sm: 6px;
+    --radius-lg: 14px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.10), 0 2px 4px rgba(0,0,0,0.05);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; background: var(--bg); font-family: 'DM Sans', sans-serif; color: var(--text); font-size: 14px; }
+
+  /* ─── LAYOUT ─── */
+  .layout { display: flex; height: 100vh; }
+
+  /* ─── LEFT SIDEBAR ─── */
+  .sidebar {
+    width: var(--sidebar-w); flex-shrink: 0;
+    background: var(--surface); border-right: 1px solid var(--border);
+    display: flex; flex-direction: column; align-items: center;
+    padding: 0 0 16px;
+    z-index: 10;
+  }
+  .sidebar-logo {
+    width: 100%; height: var(--topbar-h);
+    display: flex; align-items: center; justify-content: center;
+    border-bottom: 1px solid var(--border); flex-shrink: 0;
+  }
+  .sidebar-logo svg { width: 28px; height: 28px; }
+  .sidebar-nav { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 10px 0; }
+  .nav-item {
+    width: 48px; height: 48px; border-radius: var(--radius);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    gap: 3px; cursor: pointer; position: relative; color: var(--text-muted);
+    transition: background 0.15s, color 0.15s;
+  }
+  .nav-item:hover { background: var(--bg); color: var(--text); }
+  .nav-item.active { background: var(--green-light); color: var(--green); }
+  .nav-item svg { width: 20px; height: 20px; }
+  .nav-label { font-size: 9px; font-weight: 500; letter-spacing: 0.2px; }
+  .nav-badge {
+    position: absolute; top: 6px; right: 6px;
+    min-width: 16px; height: 16px; background: var(--red);
+    border-radius: 8px; font-size: 9px; font-weight: 600; color: white;
+    display: flex; align-items: center; justify-content: center; padding: 0 3px;
+  }
+  .sidebar-bottom { display: flex; flex-direction: column; align-items: center; gap: 2px; }
+
+  /* ─── MAIN AREA ─── */
+  .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+
+  /* ─── TOPBAR ─── */
+  .topbar {
+    height: var(--topbar-h); background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex; align-items: center; padding: 0 16px 0 20px;
+    gap: 12px; flex-shrink: 0;
+  }
+  .topbar-brand { font-size: 17px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; }
+  .topbar-brand span { color: var(--green); }
+  .topbar-space { flex: 1; }
+
+  .topbar-icon-btn {
+    width: 36px; height: 36px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); background: transparent;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer; color: var(--text-muted); transition: all 0.15s;
+  }
+  .topbar-icon-btn:hover { background: var(--bg); color: var(--text); }
+  .topbar-icon-btn svg { width: 16px; height: 16px; }
+
+  .hold-orders-btn {
+    display: flex; align-items: center; gap: 7px;
+    padding: 0 14px; height: 36px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border-strong); background: transparent;
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500;
+    color: var(--text); cursor: pointer; transition: all 0.15s; position: relative;
+  }
+  .hold-orders-btn:hover { background: var(--bg); }
+  .hold-orders-btn svg { width: 15px; height: 15px; }
+  .hold-count {
+    position: absolute; top: -6px; right: -6px;
+    width: 18px; height: 18px; background: var(--green);
+    border-radius: 50%; font-size: 10px; font-weight: 600; color: white;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* User profile in topbar */
+  .topbar-user {
+    display: flex; align-items: center; gap: 9px;
+    padding: 5px 10px 5px 5px; border-radius: var(--radius);
+    border: 1px solid var(--border); cursor: pointer;
+    transition: background 0.15s;
+  }
+  .topbar-user:hover { background: var(--bg); }
+  .user-avatar {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: #dbeafe; color: var(--blue);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; flex-shrink: 0;
+  }
+  .user-info { line-height: 1.25; }
+  .user-name { font-size: 12px; font-weight: 600; color: var(--text); }
+  .user-role { font-size: 10px; color: var(--text-muted); }
+
+  /* Online indicator */
+  .status-dot { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text-muted); }
+  .dot { width: 7px; height: 7px; border-radius: 50%; background: var(--green); }
+
+  /* Invoice tabs row */
+  .inv-tabs-bar {
+    display: flex; align-items: center;
+    background: var(--surface); border-bottom: 1px solid var(--border);
+    padding: 0 12px; gap: 2px; height: 38px; flex-shrink: 0;
+  }
+  .inv-tab {
+    display: flex; align-items: center; gap: 6px;
+    padding: 0 12px; height: 28px; border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    font-size: 12px; font-weight: 500; cursor: pointer;
+    border: 1px solid transparent; border-bottom: none;
+    color: var(--text-muted); transition: all 0.15s; white-space: nowrap;
+    position: relative; bottom: -1px;
+  }
+  .inv-tab.active { background: var(--bg); border-color: var(--border); color: var(--text); }
+  .inv-tab.hold { color: var(--amber); }
+  .tab-dot { width: 6px; height: 6px; border-radius: 50%; }
+  .tab-dot.green { background: var(--green); }
+  .tab-dot.amber { background: var(--amber); }
+  .tab-dot.gray { background: var(--border-strong); }
+  .tab-close { margin-left: 2px; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; border-radius: 3px; font-size: 12px; color: var(--text-faint); }
+  .tab-close:hover { background: var(--border); color: var(--red); }
+  .new-tab-btn {
+    padding: 0 10px; height: 28px; display: flex; align-items: center; gap: 4px;
+    font-size: 12px; font-weight: 500; color: var(--green); cursor: pointer;
+    border-radius: var(--radius-sm); transition: background 0.15s; white-space: nowrap;
+    border: 1px dashed var(--border-strong); margin-left: 2px;
+  }
+  .new-tab-btn:hover { background: var(--green-light); border-color: var(--green); }
+
+  /* ─── CONTENT ─── */
+  .content { flex: 1; display: flex; overflow: hidden; }
+
+  /* ─── PRODUCT PANEL ─── */
+  .products-panel {
+    flex: 1; display: flex; flex-direction: column;
+    background: var(--bg); min-width: 0; overflow: hidden;
+  }
+
+  /* Search bar — now lives above categories */
+  .products-search-wrap {
+    padding: 12px 16px 10px;
+    background: var(--surface); border-bottom: 1px solid var(--border);
+  }
+  .search-box {
+    display: flex; align-items: center; gap: 10px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 0 14px; height: 40px;
+    transition: border-color 0.15s, box-shadow 0.15s;
+  }
+  .search-box:focus-within { border-color: var(--green); box-shadow: 0 0 0 3px rgba(22,163,74,0.10); background: #fff; }
+  .search-box svg { width: 16px; height: 16px; color: var(--text-faint); flex-shrink: 0; }
+  .search-box input {
+    flex: 1; border: none; background: transparent; font-family: 'DM Sans', sans-serif;
+    font-size: 13px; color: var(--text); outline: none;
+  }
+  .search-box input::placeholder { color: var(--text-faint); }
+  .search-divider { width: 1px; height: 18px; background: var(--border); }
+  .scan-btn {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; font-weight: 500; color: var(--text-muted); cursor: pointer;
+    padding: 4px 2px; transition: color 0.15s;
+  }
+  .scan-btn:hover { color: var(--green); }
+  .scan-btn svg { width: 15px; height: 15px; }
+
+  /* Category tabs */
+  .cat-bar {
+    display: flex; align-items: center; gap: 6px;
+    padding: 10px 16px; background: var(--surface);
+    border-bottom: 1px solid var(--border); overflow-x: auto;
+    flex-shrink: 0;
+  }
+  .cat-bar::-webkit-scrollbar { display: none; }
+  .cat-btn {
+    padding: 5px 14px; border-radius: 20px; font-size: 12px; font-weight: 500;
+    cursor: pointer; border: 1px solid var(--border); background: transparent;
+    color: var(--text-muted); transition: all 0.15s; white-space: nowrap;
+    font-family: 'DM Sans', sans-serif;
+  }
+  .cat-btn:hover { border-color: var(--border-strong); color: var(--text); }
+  .cat-btn.active { background: var(--green); border-color: var(--green); color: white; }
+  .cat-sub { display: flex; align-items: center; gap: 4px; }
+  .cat-sub svg { width: 12px; height: 12px; }
+
+  /* Product grid */
+  .products-grid {
+    flex: 1; overflow-y: auto; padding: 14px 16px;
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(148px, 1fr)); gap: 10px;
+    align-content: start;
+  }
+  .products-grid::-webkit-scrollbar { width: 4px; }
+  .products-grid::-webkit-scrollbar-track { background: transparent; }
+  .products-grid::-webkit-scrollbar-thumb { background: var(--border-strong); border-radius: 4px; }
+
+  .prod-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius-lg); overflow: hidden; cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s, border-color 0.15s;
+    display: flex; flex-direction: column;
+  }
+  .prod-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); border-color: var(--border-strong); }
+  .prod-card:active { transform: scale(0.97); }
+  .prod-img {
+    width: 100%; aspect-ratio: 1; object-fit: cover;
+    background: var(--bg); display: flex; align-items: center;
+    justify-content: center; font-size: 36px;
+  }
+  .prod-img.emoji { padding: 14px; }
+  .prod-info { padding: 10px 10px 12px; }
+  .prod-name { font-size: 12px; font-weight: 500; color: var(--text); line-height: 1.35; margin-bottom: 5px; }
+  .prod-price { font-size: 13px; font-weight: 600; color: var(--green); }
+  .prod-sub { font-size: 10px; color: var(--text-faint); }
+  .prod-wt { display: inline-flex; align-items: center; gap: 3px; font-size: 10px; color: var(--amber); background: var(--amber-light); padding: 1px 5px; border-radius: 4px; margin-top: 3px; }
+  .prod-card.adding { animation: pulse-green 0.3s ease; }
+  @keyframes pulse-green { 0%,100% { border-color: var(--border); } 50% { border-color: var(--green); box-shadow: 0 0 0 3px rgba(22,163,74,0.15); } }
+
+  /* Empty state */
+  .empty-products { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 300px; color: var(--text-faint); gap: 8px; }
+  .empty-products svg { width: 40px; height: 40px; opacity: 0.4; }
+  .empty-products p { font-size: 13px; }
+
+  /* ─── CART PANEL ─── */
+  .cart-panel {
+    width: var(--cart-w); flex-shrink: 0;
+    background: var(--surface); border-left: 1px solid var(--border);
+    display: flex; flex-direction: column; overflow: hidden;
+  }
+
+  /* Customer row */
+  .customer-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 12px 16px; border-bottom: 1px solid var(--border); flex-shrink: 0;
+  }
+  .customer-info { display: flex; align-items: center; gap: 10px; }
+  .cust-avatar {
+    width: 34px; height: 34px; border-radius: 50%;
+    background: var(--bg); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: var(--text-muted);
+  }
+  .cust-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .cust-email { font-size: 11px; color: var(--text-muted); }
+  .cust-cart-icon {
+    position: relative; width: 34px; height: 34px; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    border-radius: var(--radius-sm); border: 1px solid var(--border);
+    color: var(--text-muted); transition: all 0.15s;
+  }
+  .cust-cart-icon:hover { background: var(--bg); color: var(--text); }
+  .cust-cart-icon svg { width: 17px; height: 17px; }
+  .cust-cart-badge {
+    position: absolute; top: -5px; right: -5px;
+    min-width: 16px; height: 16px; background: var(--green);
+    border-radius: 8px; font-size: 9px; font-weight: 600; color: white;
+    display: flex; align-items: center; justify-content: center; padding: 0 3px;
+  }
+
+  /* Cart items */
+  .cart-items { flex: 1; overflow-y: auto; }
+  .cart-items::-webkit-scrollbar { width: 3px; }
+  .cart-items::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+  .cart-empty { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px; color: var(--text-faint); gap: 8px; }
+  .cart-empty svg { width: 36px; height: 36px; opacity: 0.35; }
+  .cart-empty p { font-size: 13px; }
+
+  .cart-item { border-bottom: 1px solid var(--border); }
+  .cart-item-row {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 14px; cursor: pointer; transition: background 0.12s;
+  }
+  .cart-item-row:hover { background: var(--bg); }
+  .cart-item-row.expanded { background: var(--green-light); }
+  .cart-chevron { width: 16px; height: 16px; color: var(--text-faint); flex-shrink: 0; transition: transform 0.2s; }
+  .cart-chevron.open { transform: rotate(90deg); color: var(--green); }
+  .cart-item-name { flex: 1; font-size: 12px; font-weight: 500; color: var(--text); }
+  .cart-item-qty { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
+  .cart-item-price { font-size: 13px; font-weight: 600; color: var(--text); flex-shrink: 0; min-width: 56px; text-align: right; }
+  .cart-remove { width: 22px; height: 22px; border-radius: 4px; border: none; background: transparent; color: var(--text-faint); cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s; }
+  .cart-remove:hover { background: var(--red-light); color: var(--red); }
+  .cart-remove svg { width: 14px; height: 14px; }
+
+  /* Expanded item controls */
+  .cart-item-controls {
+    display: none; padding: 6px 14px 14px 40px; gap: 12px;
+    background: var(--green-light); border-top: 1px solid var(--green-mid);
+  }
+  .cart-item-controls.show { display: flex; align-items: center; }
+  .ctrl-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); margin-bottom: 4px; }
+  .ctrl-group { display: flex; flex-direction: column; }
+  .qty-ctrl { display: flex; align-items: center; gap: 0; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); overflow: hidden; background: white; }
+  .qty-btn { width: 28px; height: 28px; border: none; background: transparent; font-size: 16px; cursor: pointer; color: var(--text-muted); display: flex; align-items: center; justify-content: center; transition: background 0.1s; }
+  .qty-btn:hover { background: var(--bg); color: var(--text); }
+  .qty-val { font-size: 13px; font-weight: 600; min-width: 32px; text-align: center; color: var(--text); font-family: 'DM Mono', monospace; }
+  .disc-ctrl { display: flex; align-items: center; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); overflow: hidden; background: white; height: 28px; }
+  .disc-prefix { padding: 0 7px; font-size: 11px; font-weight: 600; color: var(--text-muted); border-right: 1px solid var(--border); height: 100%; display: flex; align-items: center; }
+  .disc-input { width: 44px; border: none; font-family: 'DM Mono', sans-serif; font-size: 12px; font-weight: 600; text-align: center; outline: none; color: var(--text); background: transparent; }
+  .disc-apply { width: 28px; height: 100%; border: none; background: var(--green); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s; }
+  .disc-apply:hover { background: var(--green-dark); }
+  .disc-apply svg { width: 13px; height: 13px; }
+
+  /* Add note */
+  .cart-note-row { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; border-bottom: 1px solid var(--border); }
+  .cart-note-btn { font-size: 11px; color: var(--text-muted); cursor: pointer; display: flex; align-items: center; gap: 4px; }
+  .cart-note-btn:hover { color: var(--green); }
+  .cart-note-btn svg { width: 12px; height: 12px; }
+
+  /* Totals */
+  .cart-totals { padding: 12px 16px 10px; border-top: 1px solid var(--border); flex-shrink: 0; }
+  .total-row { display: flex; justify-content: space-between; font-size: 12px; color: var(--text-muted); margin-bottom: 5px; }
+  .total-row.disc { color: var(--green); }
+  .total-grand { display: flex; justify-content: space-between; font-size: 19px; font-weight: 700; color: var(--text); margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); letter-spacing: -0.3px; }
+
+  /* Print lang override */
+  .print-lang-row { padding: 8px 16px; border-top: 1px solid var(--border); display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .print-lang-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-faint); }
+  .lang-pill {
+    padding: 3px 9px; border-radius: 12px; font-size: 11px; font-weight: 500;
+    border: 1px solid var(--border); cursor: pointer; color: var(--text-muted);
+    transition: all 0.15s;
+  }
+  .lang-pill.active { background: var(--green); border-color: var(--green); color: white; }
+
+  /* Action buttons */
+  .cart-actions { display: flex; gap: 8px; padding: 10px 16px 14px; flex-shrink: 0; }
+  .hold-btn {
+    flex: 1; height: 44px; border: 1px solid var(--border-strong);
+    background: transparent; border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+    color: var(--text); cursor: pointer; display: flex; align-items: center;
+    justify-content: center; gap: 7px; transition: all 0.15s;
+  }
+  .hold-btn:hover { background: var(--bg); }
+  .hold-btn svg { width: 15px; height: 15px; }
+  .proceed-btn {
+    flex: 1.6; height: 44px; background: var(--green);
+    border: none; border-radius: var(--radius);
+    font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 600;
+    color: white; cursor: pointer; display: flex; align-items: center;
+    justify-content: center; gap: 7px; transition: all 0.15s;
+  }
+  .proceed-btn:hover { background: var(--green-dark); }
+  .proceed-btn:disabled { background: var(--border-strong); color: var(--text-faint); cursor: not-allowed; }
+  .proceed-btn svg { width: 15px; height: 15px; }
+
+  /* ─── NUMPAD QUICK ACCESS ─── */
+  .numpad-strip {
+    padding: 0 16px 10px; display: flex; align-items: center; gap: 6px;
+    border-top: 1px solid var(--border); flex-shrink: 0; background: var(--bg);
+  }
+  .num-disp {
+    flex: 1; background: white; border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm); padding: 6px 10px;
+    font-family: 'DM Mono', monospace; font-size: 16px; font-weight: 500;
+    color: var(--text); text-align: right; height: 36px; display: flex;
+    align-items: center; justify-content: flex-end;
+  }
+  .npd-grid { display: grid; grid-template-columns: repeat(6,1fr); gap: 3px; }
+  .npk {
+    width: 32px; height: 30px; border-radius: var(--radius-sm);
+    border: 1px solid var(--border); background: white;
+    font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500;
+    cursor: pointer; color: var(--text); transition: background 0.1s;
+  }
+  .npk:hover { background: var(--bg); }
+  .npk:active { transform: scale(0.93); }
+  .npk.bsp { color: var(--red); font-size: 14px; }
+  .npk.clr { color: var(--text-muted); font-size: 11px; }
+  .numpad-strip-label { font-size: 10px; color: var(--text-faint); text-align: center; padding-top: 2px; }
+
+  /* ─── PAYMENT MODAL ─── */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4);
+    z-index: 100; align-items: center; justify-content: center;
+    backdrop-filter: blur(2px);
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: white; border-radius: var(--radius-lg);
+    width: 420px; max-width: 95vw; box-shadow: var(--shadow-md);
+    animation: modal-in 0.2s ease;
+  }
+  @keyframes modal-in { from { transform: scale(0.95); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  .modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 18px; border-bottom: 1px solid var(--border); }
+  .modal-title { font-size: 15px; font-weight: 600; }
+  .modal-close { width: 28px; height: 28px; border: none; background: transparent; cursor: pointer; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; color: var(--text-muted); }
+  .modal-close:hover { background: var(--bg); color: var(--red); }
+  .modal-close svg { width: 14px; height: 14px; }
+  .modal-body { padding: 16px 18px; }
+  .modal-footer { padding: 12px 18px; border-top: 1px solid var(--border); display: flex; gap: 8px; justify-content: flex-end; }
+  .modal-btn { padding: 8px 16px; border-radius: var(--radius-sm); font-family: 'DM Sans', sans-serif; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.15s; }
+  .modal-btn.cancel { border: 1px solid var(--border); background: transparent; color: var(--text-muted); }
+  .modal-btn.cancel:hover { background: var(--bg); }
+  .modal-btn.confirm { background: var(--green); border: none; color: white; }
+  .modal-btn.confirm:hover { background: var(--green-dark); }
+
+  /* Payment method grid */
+  .pay-methods { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 14px; }
+  .pay-method {
+    padding: 14px 12px; border: 1.5px solid var(--border); border-radius: var(--radius);
+    cursor: pointer; text-align: center; transition: all 0.15s; background: var(--bg);
+  }
+  .pay-method:hover { border-color: var(--border-strong); background: white; }
+  .pay-method.active { border-color: var(--green); border-width: 2px; background: var(--green-light); }
+  .pay-method-icon { font-size: 22px; margin-bottom: 4px; }
+  .pay-method-name { font-size: 12px; font-weight: 600; color: var(--text); }
+
+  .cash-section label { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; display: block; margin-bottom: 5px; }
+  .cash-section input {
+    width: 100%; padding: 10px 12px; border: 1px solid var(--border-strong);
+    border-radius: var(--radius-sm); font-size: 20px; font-weight: 600;
+    font-family: 'DM Mono', monospace; text-align: right; color: var(--text);
+    outline: none; margin-bottom: 10px;
+  }
+  .cash-section input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(22,163,74,0.10); }
+  .change-row { display: flex; justify-content: space-between; font-size: 13px; padding: 5px 0; color: var(--text-muted); }
+  .change-row.change-val { font-weight: 700; color: var(--green); font-size: 15px; }
+
+  /* Price check modal */
+  .pc-result { background: var(--bg); border-radius: var(--radius); padding: 18px; text-align: center; }
+  .pc-icon { font-size: 36px; margin-bottom: 8px; }
+  .pc-name { font-size: 15px; font-weight: 600; margin-bottom: 4px; }
+  .pc-price { font-size: 30px; font-weight: 700; color: var(--green); }
+  .pc-meta { font-size: 11px; color: var(--text-muted); margin-top: 5px; }
+
+  /* Toast */
+  .toast {
+    display: none; position: fixed; bottom: 24px; right: 24px;
+    background: #1c1917; color: white; padding: 12px 18px;
+    border-radius: var(--radius); font-size: 13px; font-weight: 500;
+    z-index: 200; box-shadow: var(--shadow-md); gap: 8px;
+    align-items: center;
+  }
+  .toast.show { display: flex; animation: slide-up 0.25s ease; }
+  @keyframes slide-up { from { transform: translateY(12px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .toast-icon { width: 18px; height: 18px; border-radius: 50%; background: var(--green); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+  .toast-icon svg { width: 11px; height: 11px; }
+
+  /* Scrollbar for items */
+  .cart-items::-webkit-scrollbar { width: 3px; }
+
+  /* Lang switcher in topbar */
+  .lang-switcher { display: flex; gap: 2px; padding: 3px; background: var(--bg); border-radius: var(--radius-sm); border: 1px solid var(--border); }
+  .lang-btn { padding: 3px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; cursor: pointer; border: none; background: transparent; color: var(--text-muted); font-family: 'DM Sans', sans-serif; }
+  .lang-btn.active { background: white; color: var(--text); box-shadow: 0 1px 2px rgba(0,0,0,0.08); }
+</style>
+</head>
+<body>
+
+<div class="layout">
+
+  <!-- ─── LEFT SIDEBAR ─── -->
+  <nav class="sidebar">
+    <div class="sidebar-logo">
+      <svg viewBox="0 0 28 28" fill="none">
+        <rect width="28" height="28" rx="8" fill="#16a34a"/>
+        <path d="M7 10h14M7 14h10M7 18h6" stroke="white" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="21" cy="18" r="3.5" fill="white" fill-opacity="0.9"/>
+      </svg>
+    </div>
+    <div class="sidebar-nav">
+      <div class="nav-item active" title="Home / POS">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h3a1 1 0 001-1v-3h2v3a1 1 0 001 1h3a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z"/></svg>
+        <span class="nav-label">Home</span>
+      </div>
+      <div class="nav-item" title="Customers">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9 6a3 3 0 11-6 0 3 3 0 016 0zM17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z"/></svg>
+        <span class="nav-label">Customers</span>
+      </div>
+      <div class="nav-item" title="Orders">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z"/><path fill-rule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clip-rule="evenodd"/></svg>
+        <span class="nav-label">Orders</span>
+        <div class="nav-badge">3</div>
+      </div>
+      <div class="nav-item" title="Products">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M4 3a2 2 0 100 4h12a2 2 0 100-4H4z"/><path fill-rule="evenodd" d="M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z" clip-rule="evenodd"/></svg>
+        <span class="nav-label">Products</span>
+      </div>
+      <div class="nav-item" title="Reports">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
+        <span class="nav-label">Reports</span>
+      </div>
+      <div class="nav-item" title="Settings">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z" clip-rule="evenodd"/></svg>
+        <span class="nav-label">Settings</span>
+      </div>
+    </div>
+    <div class="sidebar-bottom">
+      <div class="nav-item" title="Logout" style="color:var(--text-faint)">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/></svg>
+        <span class="nav-label">Logout</span>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ─── MAIN ─── -->
+  <div class="main">
+
+    <!-- TOPBAR -->
+    <div class="topbar">
+      <span class="topbar-brand">Smart<span>POS</span></span>
+
+      <div class="topbar-space"></div>
+
+      <div class="status-dot"><div class="dot"></div><span>Online</span></div>
+
+      <!-- Language switcher -->
+      <div class="lang-switcher" id="langSw">
+        <button class="lang-btn active" onclick="setLang('EN',this)">EN</button>
+        <button class="lang-btn" onclick="setLang('AR',this)">AR</button>
+        <button class="lang-btn" onclick="setLang('HE',this)">HE</button>
+      </div>
+
+      <button class="topbar-icon-btn" title="Refresh" onclick="toast('Data refreshed')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/></svg>
+      </button>
+      <button class="topbar-icon-btn" title="Customer Display" onclick="toast('Customer display opened on screen 2')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z" clip-rule="evenodd"/></svg>
+      </button>
+      <button class="topbar-icon-btn" title="Price Check" onclick="openPriceCheck()">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/></svg>
+      </button>
+
+      <button class="hold-orders-btn" onclick="toast('Hold orders panel opened')">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+        Hold Orders
+        <div class="hold-count" id="holdCount">1</div>
+      </button>
+
+      <!-- User profile — in topbar -->
+      <div class="topbar-user" onclick="toast('Profile settings opened')">
+        <div class="user-avatar">AH</div>
+        <div class="user-info">
+          <div class="user-name">Ahmad H.</div>
+          <div class="user-role">Cashier</div>
+        </div>
+        <svg viewBox="0 0 20 20" fill="currentColor" style="width:14px;height:14px;color:var(--text-faint);margin-left:2px"><path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+      </div>
+    </div>
+
+    <!-- INVOICE TABS -->
+    <div class="inv-tabs-bar" id="tabsBar"></div>
+
+    <!-- CONTENT ROW -->
+    <div class="content">
+
+      <!-- PRODUCTS PANEL -->
+      <div class="products-panel">
+
+        <!-- Search bar — above categories -->
+        <div class="products-search-wrap">
+          <div class="search-box">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/></svg>
+            <input type="text" id="searchInput" placeholder="Search products or scan barcode..." oninput="filterProducts(this.value)" autofocus>
+            <div class="search-divider"></div>
+            <div class="scan-btn" onclick="toast('Barcode scanner mode active')">
+              <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M3 4a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm2 2V5h1v1H5zM3 13a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3zm2 2v-1h1v1H5zM13 3a1 1 0 00-1 1v3a1 1 0 001 1h3a1 1 0 001-1V4a1 1 0 00-1-1h-3zm1 2v1h1V5h-1zM11 13a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-3zm2 2v-1h1v1h-1z" clip-rule="evenodd"/></svg>
+              Scan
+            </div>
+          </div>
+        </div>
+
+        <!-- Category tabs — below search -->
+        <div class="cat-bar" id="catBar">
+          <button class="cat-btn active" onclick="filterCat('All',this)">All</button>
+          <button class="cat-btn" onclick="filterCat('Dairy',this)">Dairy</button>
+          <button class="cat-btn" onclick="filterCat('Bakery',this)">Bakery</button>
+          <button class="cat-btn" onclick="filterCat('Produce',this)">Produce</button>
+          <button class="cat-btn" onclick="filterCat('Beverages',this)">Beverages</button>
+          <button class="cat-btn" onclick="filterCat('Staples',this)">Staples</button>
+          <button class="cat-btn" onclick="filterCat('Snacks',this)">Snacks</button>
+          <button class="cat-btn" onclick="filterCat('Household',this)">Household</button>
+        </div>
+
+        <!-- Product grid -->
+        <div class="products-grid" id="prodGrid"></div>
+      </div>
+
+      <!-- CART PANEL -->
+      <div class="cart-panel">
+
+        <!-- Customer row -->
+        <div class="customer-row">
+          <div class="customer-info">
+            <div class="cust-avatar">WK</div>
+            <div>
+              <div class="cust-name">Walk-in Customer</div>
+              <div class="cust-email" style="cursor:pointer;color:var(--green)" onclick="toast('Customer search opened')">+ Assign customer</div>
+            </div>
+          </div>
+          <div class="cust-cart-icon" onclick="toast('Cart summary')">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg>
+            <div class="cust-cart-badge" id="cartBadge">0</div>
+          </div>
+        </div>
+
+        <!-- Cart items -->
+        <div class="cart-items" id="cartItems"></div>
+
+        <!-- Note row -->
+        <div class="cart-note-row">
+          <div class="cart-note-btn" onclick="toast('Note added to invoice')">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z" clip-rule="evenodd"/></svg>
+            Add note to invoice
+          </div>
+          <div class="cart-note-btn" onclick="toast('Discount applied to invoice')">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M5 2a2 2 0 00-2 2v14l3.5-2 3.5 2 3.5-2 3.5 2V4a2 2 0 00-2-2H5zm2.5 3a1.5 1.5 0 100 3 1.5 1.5 0 000-3zm6.207.293a1 1 0 00-1.414 0l-6 6a1 1 0 101.414 1.414l6-6a1 1 0 000-1.414zM12.5 10a1.5 1.5 0 100 3 1.5 1.5 0 000-3z" clip-rule="evenodd"/></svg>
+            Discount
+          </div>
+        </div>
+
+        <!-- Numpad strip -->
+        <div class="numpad-strip">
+          <div style="display:flex;flex-direction:column;gap:2px;flex:1">
+            <div style="font-size:10px;color:var(--text-faint);margin-bottom:2px">QTY / WEIGHT</div>
+            <div class="num-disp" id="numDisp">1</div>
+          </div>
+          <div style="display:flex;flex-direction:column;gap:3px">
+            <div class="npd-grid">
+              <button class="npk" onclick="numKey('7')">7</button><button class="npk" onclick="numKey('8')">8</button><button class="npk" onclick="numKey('9')">9</button>
+              <button class="npk" onclick="numKey('4')">4</button><button class="npk" onclick="numKey('5')">5</button><button class="npk" onclick="numKey('6')">6</button>
+              <button class="npk" onclick="numKey('1')">1</button><button class="npk" onclick="numKey('2')">2</button><button class="npk" onclick="numKey('3')">3</button>
+              <button class="npk" onclick="numKey('.')">.</button><button class="npk" onclick="numKey('0')">0</button><button class="npk bsp" onclick="numBack()">⌫</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Totals -->
+        <div class="cart-totals">
+          <div class="total-row"><span id="lSub">Subtotal</span><span id="vSub">₪ 0.00</span></div>
+          <div class="total-row"><span id="lTax">VAT (17%)</span><span id="vTax">₪ 0.00</span></div>
+          <div class="total-row disc" id="discRow" style="display:none"><span>Discount</span><span id="vDisc">₪ 0.00</span></div>
+          <div class="total-grand"><span id="lTot">Total</span><span id="vTot">₪ 0.00</span></div>
+        </div>
+
+        <!-- Print language override -->
+        <div class="print-lang-row">
+          <span class="print-lang-label">Print as:</span>
+          <div class="lang-pill active" onclick="togglePrintLang(this,'AR')">AR</div>
+          <div class="lang-pill" onclick="togglePrintLang(this,'EN')">EN</div>
+          <div class="lang-pill" onclick="togglePrintLang(this,'HE')">HE</div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="cart-actions">
+          <button class="hold-btn" onclick="holdInvoice()">
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+            Hold Order
+          </button>
+          <button class="proceed-btn" id="proceedBtn" onclick="openPayModal()" disabled>
+            <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/></svg>
+            Proceed
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAYMENT MODAL -->
+<div class="modal-overlay" id="payModal">
+  <div class="modal">
+    <div class="modal-header">
+      <span class="modal-title">Process Payment</span>
+      <button class="modal-close" onclick="closePayModal()">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="pay-methods">
+        <div class="pay-method active" onclick="selectPM('cash',this)">
+          <div class="pay-method-icon">💵</div>
+          <div class="pay-method-name">Cash</div>
+        </div>
+        <div class="pay-method" onclick="selectPM('card',this)">
+          <div class="pay-method-icon">💳</div>
+          <div class="pay-method-name">Credit Card</div>
+        </div>
+        <div class="pay-method" onclick="selectPM('bit',this)">
+          <div class="pay-method-icon">📱</div>
+          <div class="pay-method-name">Bit / PayBox</div>
+        </div>
+        <div class="pay-method" onclick="selectPM('check',this)">
+          <div class="pay-method-icon">📄</div>
+          <div class="pay-method-name">Check</div>
+        </div>
+      </div>
+      <div class="cash-section" id="cashSec">
+        <label>Amount Received (₪)</label>
+        <input type="number" id="cashIn" placeholder="0.00" oninput="calcChange()">
+        <div class="change-row"><span>Total Due</span><span id="pmTotal">₪ 0.00</span></div>
+        <div class="change-row change-val"><span>Change</span><span id="pmChange">₪ 0.00</span></div>
+      </div>
+      <div id="cardSec" style="display:none;text-align:center;padding:18px;background:var(--bg);border-radius:var(--radius)">
+        <div style="font-size:13px;color:var(--text-muted);margin-bottom:6px">Present card to terminal</div>
+        <div style="font-size:28px;font-weight:700" id="pmTotal2">₪ 0.00</div>
+      </div>
+      <div style="margin-top:14px;padding-top:12px;border-top:1px solid var(--border)">
+        <div style="font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;color:var(--text-faint);margin-bottom:8px">Print invoice in language</div>
+        <div style="display:flex;gap:10px">
+          <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="pAR" checked> Arabic</label>
+          <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="pEN"> English</label>
+          <label style="display:flex;align-items:center;gap:5px;font-size:12px;cursor:pointer"><input type="checkbox" id="pHE"> Hebrew</label>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn cancel" onclick="closePayModal()">Cancel</button>
+      <button class="modal-btn confirm" onclick="completeSale()">Complete & Print</button>
+    </div>
+  </div>
+</div>
+
+<!-- PRICE CHECK MODAL -->
+<div class="modal-overlay" id="pcModal">
+  <div class="modal" style="width:360px">
+    <div class="modal-header">
+      <span class="modal-title">Price Check</span>
+      <button class="modal-close" onclick="closePCModal()">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg>
+      </button>
+    </div>
+    <div class="modal-body">
+      <div class="search-box" style="margin-bottom:14px">
+        <svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/></svg>
+        <input type="text" id="pcInput" placeholder="Type product name or scan..." oninput="doPriceCheck(this.value)">
+      </div>
+      <div id="pcResult"><div style="text-align:center;color:var(--text-faint);font-size:13px;padding:24px 0">Scan a barcode or type a product name</div></div>
+    </div>
+    <div class="modal-footer">
+      <button class="modal-btn cancel" onclick="closePCModal()">Close</button>
+      <button class="modal-btn confirm" id="pcAddBtn" style="display:none" onclick="addFromPC()">+ Add to Invoice</button>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toastEl">
+  <div class="toast-icon">
+    <svg viewBox="0 0 12 12" fill="white"><path d="M2 6l3 3 5-5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>
+  </div>
+  <span id="toastMsg">Done</span>
+</div>
+
+<script>
+const PRODUCTS = [
+  {id:1,name:'White Bread',price:6.50,cat:'Bakery',icon:'🍞',bc:'001'},
+  {id:2,name:'Fresh Milk 1L',price:5.80,cat:'Dairy',icon:'🥛',bc:'002'},
+  {id:3,name:'Yellow Cheese 200g',price:18.90,cat:'Dairy',icon:'🧀',bc:'003'},
+  {id:4,name:'Red Apples 1kg',price:8.50,cat:'Produce',icon:'🍎',bc:'004',wt:true},
+  {id:5,name:'Ground Coffee 200g',price:32.00,cat:'Beverages',icon:'☕',bc:'005'},
+  {id:6,name:'Mineral Water 1.5L',price:4.20,cat:'Beverages',icon:'💧',bc:'006'},
+  {id:7,name:'Basmati Rice 1kg',price:9.90,cat:'Staples',icon:'🌾',bc:'007'},
+  {id:8,name:'Extra Virgin Olive Oil',price:24.50,cat:'Staples',icon:'🫙',bc:'008'},
+  {id:9,name:'Greek Yogurt 500g',price:7.30,cat:'Dairy',icon:'🥣',bc:'009'},
+  {id:10,name:'Vine Tomatoes 1kg',price:6.80,cat:'Produce',icon:'🍅',bc:'010',wt:true},
+  {id:11,name:'Pita Bread x6',price:9.90,cat:'Bakery',icon:'🫓',bc:'011'},
+  {id:12,name:'Orange Juice 1L',price:12.50,cat:'Beverages',icon:'🍊',bc:'012'},
+  {id:13,name:'Potato Chips 150g',price:8.90,cat:'Snacks',icon:'🥔',bc:'013'},
+  {id:14,name:'Chocolate Bar 100g',price:6.20,cat:'Snacks',icon:'🍫',bc:'014'},
+  {id:15,name:'Laundry Detergent',price:19.90,cat:'Household',icon:'🧴',bc:'015'},
+  {id:16,name:'Cucumber 500g',price:4.50,cat:'Produce',icon:'🥒',bc:'016',wt:true},
+  {id:17,name:'Butter 250g',price:11.90,cat:'Dairy',icon:'🧈',bc:'017'},
+  {id:18,name:'Eggs x12',price:14.50,cat:'Dairy',icon:'🥚',bc:'018'},
+];
+
+let state = {
+  invoices: [
+    {id:1,num:'#001',items:[],status:'active',disc:0},
+    {id:2,num:'#002',items:[{p:PRODUCTS[0],q:2},{p:PRODUCTS[2],q:1}],status:'hold',disc:0},
+  ],
+  active: 0,
+  curCat: 'All',
+  numBuf: '1',
+  selItem: -1,
+  pcProd: null,
+  payMethod: 'cash',
+};
+
+const f = n => '₪ ' + n.toFixed(2);
+
+function inv() { return state.invoices[state.active]; }
+
+function totals() {
+  const it = inv().items;
+  const sub = it.reduce((a,i)=>a+i.q*i.p.price,0);
+  const disc = inv().disc||0;
+  const afterDisc = sub * (1 - disc/100);
+  const tax = afterDisc * 0.17;
+  return { sub: afterDisc, tax, tot: afterDisc + tax, discAmt: sub - afterDisc };
+}
+
+// ─ TABS ─
+function renderTabs() {
+  const bar = document.getElementById('tabsBar');
+  bar.innerHTML = '';
+  state.invoices.forEach((iv,i) => {
+    const d = document.createElement('div');
+    const hold = iv.status === 'hold';
+    d.className = 'inv-tab' + (i===state.active?' active':'') + (hold?' hold':'');
+    const col = hold ? 'amber' : (i===state.active ? 'green' : 'gray');
+    d.innerHTML = `<div class="tab-dot ${col}"></div>${iv.num} (${iv.items.length})<span class="tab-close" onclick="closeTab(event,${i})">×</span>`;
+    d.onclick = e => { if (!e.target.classList.contains('tab-close')) switchTab(i); };
+    bar.appendChild(d);
+  });
+  const nb = document.createElement('div');
+  nb.className = 'new-tab-btn';
+  nb.innerHTML = '+ New Invoice';
+  nb.onclick = newInvoice;
+  bar.appendChild(nb);
+}
+
+function switchTab(i) { state.active=i; state.selItem=-1; state.numBuf='1'; renderAll(); }
+function closeTab(e,i) {
+  e.stopPropagation();
+  if (state.invoices.length===1) return;
+  state.invoices.splice(i,1);
+  if (state.active>=state.invoices.length) state.active=state.invoices.length-1;
+  renderAll();
+}
+function newInvoice() {
+  const n = String(state.invoices.length+1).padStart(3,'0');
+  state.invoices.push({id:Date.now(),num:'#'+n,items:[],status:'active',disc:0});
+  state.active=state.invoices.length-1;
+  renderAll();
+}
+
+// ─ PRODUCTS ─
+function renderProducts(q='', cat='All') {
+  const g = document.getElementById('prodGrid');
+  const filtered = PRODUCTS.filter(p =>
+    (cat==='All'||p.cat===cat) &&
+    (p.name.toLowerCase().includes(q.toLowerCase()) || p.bc===q || q==='')
+  );
+  if (!filtered.length) {
+    g.innerHTML = `<div class="empty-products" style="grid-column:1/-1"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z" clip-rule="evenodd"/></svg><p>No products found</p></div>`;
+    return;
+  }
+  g.innerHTML = '';
+  filtered.forEach(p => {
+    const d = document.createElement('div');
+    d.className = 'prod-card';
+    d.innerHTML = `<div class="prod-img emoji">${p.icon}</div><div class="prod-info"><div class="prod-name">${p.name}</div><div class="prod-price">${f(p.price)}${p.wt?'/kg':''}</div>${p.wt?'<div class="prod-wt">⚖ By weight</div>':''}</div>`;
+    d.onclick = () => { addToCart(p); d.classList.add('adding'); setTimeout(()=>d.classList.remove('adding'),350); };
+    g.appendChild(d);
+  });
+}
+
+function filterProducts(v) { renderProducts(v, state.curCat); }
+function filterCat(c, btn) {
+  state.curCat=c;
+  document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  renderProducts(document.getElementById('searchInput').value, c);
+}
+
+// ─ CART ─
+function addToCart(p) {
+  const q = parseFloat(state.numBuf)||1;
+  const ex = inv().items.find(i=>i.p.id===p.id);
+  if (ex) ex.q = parseFloat((ex.q+q).toFixed(3));
+  else inv().items.push({p,q});
+  state.numBuf='1'; document.getElementById('numDisp').textContent='1';
+  renderCart();
+}
+
+function renderCart() {
+  const ci = document.getElementById('cartItems');
+  const items = inv().items;
+  document.getElementById('cartBadge').textContent = items.reduce((a,i)=>a+i.q,0).toFixed(0);
+
+  if (!items.length) {
+    ci.innerHTML = `<div class="cart-empty"><svg viewBox="0 0 20 20" fill="currentColor"><path d="M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3z"/><path d="M16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z"/></svg><p>Cart is empty</p></div>`;
+    document.getElementById('proceedBtn').disabled = true;
+    renderTotals();
+    renderTabs();
+    return;
+  }
+
+  ci.innerHTML = '';
+  items.forEach((it,i) => {
+    const row = document.createElement('div');
+    row.className = 'cart-item';
+    const isExp = state.selItem===i;
+    const total = it.q * it.p.price;
+    row.innerHTML = `
+      <div class="cart-item-row${isExp?' expanded':''}" onclick="selItem(${i})">
+        <svg class="cart-chevron${isExp?' open':''}" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"/></svg>
+        <span class="cart-item-name">${it.p.name}</span>
+        <span class="cart-item-qty">× ${it.q%1===0?it.q:it.q.toFixed(2)}</span>
+        <span class="cart-item-price">${f(total)}</span>
+        <button class="cart-remove" onclick="removeItem(event,${i})"><svg viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"/></svg></button>
+      </div>
+      <div class="cart-item-controls${isExp?' show':''}">
+        <div class="ctrl-group">
+          <div class="ctrl-label">Qty</div>
+          <div class="qty-ctrl">
+            <button class="qty-btn" onclick="chgQty(${i},-1)">−</button>
+            <span class="qty-val">${it.q%1===0?it.q:it.q.toFixed(2)}</span>
+            <button class="qty-btn" onclick="chgQty(${i},1)">+</button>
+          </div>
+        </div>
+        <div class="ctrl-group">
+          <div class="ctrl-label">Discount</div>
+          <div class="disc-ctrl">
+            <div class="disc-prefix">%</div>
+            <input class="disc-input" type="number" min="0" max="100" value="0" id="disc_${i}">
+            <button class="disc-apply" onclick="applyItemDisc(${i})"><svg viewBox="0 0 20 20" fill="white"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/></svg></button>
+          </div>
+        </div>
+      </div>`;
+    ci.appendChild(row);
+  });
+
+  document.getElementById('proceedBtn').disabled = false;
+  renderTotals();
+  renderTabs();
+}
+
+function selItem(i) { state.selItem = state.selItem===i ? -1 : i; renderCart(); }
+function removeItem(e, i) { e.stopPropagation(); inv().items.splice(i,1); if(state.selItem>=inv().items.length) state.selItem=-1; renderCart(); }
+function chgQty(i, d) { inv().items[i].q = Math.max(0.1, parseFloat((inv().items[i].q+d).toFixed(3))); renderCart(); }
+function applyItemDisc(i) { const v = parseFloat(document.getElementById('disc_'+i).value)||0; inv().items[i].p = {...inv().items[i].p, price: PRODUCTS.find(p=>p.id===inv().items[i].p.id).price * (1-v/100)}; renderCart(); }
+
+function renderTotals() {
+  const t = totals();
+  document.getElementById('vSub').textContent = f(t.sub);
+  document.getElementById('vTax').textContent = f(t.tax);
+  document.getElementById('vTot').textContent = f(t.tot);
+  const dr = document.getElementById('discRow');
+  if (t.discAmt > 0) { dr.style.display='flex'; document.getElementById('vDisc').textContent='-'+f(t.discAmt); }
+  else { dr.style.display='none'; }
+}
+
+function holdInvoice() {
+  inv().status = inv().status==='hold' ? 'active' : 'hold';
+  const hc = document.getElementById('holdCount');
+  const holds = state.invoices.filter(i=>i.status==='hold').length;
+  hc.textContent = holds;
+  hc.style.display = holds ? 'flex' : 'none';
+  renderTabs();
+  toast(inv().status==='hold' ? 'Invoice placed on hold' : 'Invoice resumed');
+}
+
+// ─ NUMPAD ─
+function numKey(c) {
+  if (c==='.'&&state.numBuf.includes('.')) return;
+  if (state.numBuf==='1'&&c!=='.') state.numBuf=c; else state.numBuf+=c;
+  if (state.numBuf.length>8) state.numBuf=state.numBuf.slice(0,8);
+  document.getElementById('numDisp').textContent=state.numBuf;
+  if (state.selItem>=0) { const q=parseFloat(state.numBuf); if(!isNaN(q)&&q>0){inv().items[state.selItem].q=q;renderCart();} }
+}
+function numBack() { state.numBuf=state.numBuf.length>1?state.numBuf.slice(0,-1):'1'; document.getElementById('numDisp').textContent=state.numBuf; }
+
+// ─ PAYMENT ─
+function openPayModal() {
+  const t=totals();
+  document.getElementById('pmTotal').textContent=f(t.tot);
+  document.getElementById('pmTotal2').textContent=f(t.tot);
+  document.getElementById('cashIn').value='';
+  document.getElementById('pmChange').textContent=f(0);
+  document.getElementById('payModal').classList.add('show');
+}
+function closePayModal() { document.getElementById('payModal').classList.remove('show'); }
+function selectPM(m, el) {
+  state.payMethod=m;
+  document.querySelectorAll('.pay-method').forEach(b=>b.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('cashSec').style.display = m==='cash'?'block':'none';
+  document.getElementById('cardSec').style.display = m==='cash'?'none':'block';
+}
+function calcChange() {
+  const received=parseFloat(document.getElementById('cashIn').value)||0;
+  const due=totals().tot;
+  document.getElementById('pmChange').textContent=f(Math.max(0,received-due));
+}
+function completeSale() {
+  closePayModal();
+  inv().items=[];
+  inv().disc=0;
+  state.selItem=-1;
+  renderAll();
+  toast('Payment complete — invoice printed');
+}
+
+// ─ PRICE CHECK ─
+function openPriceCheck() {
+  document.getElementById('pcModal').classList.add('show');
+  state.pcProd=null;
+  document.getElementById('pcInput').value='';
+  document.getElementById('pcResult').innerHTML='<div style="text-align:center;color:var(--text-faint);font-size:13px;padding:24px 0">Scan a barcode or type a product name</div>';
+  document.getElementById('pcAddBtn').style.display='none';
+  setTimeout(()=>document.getElementById('pcInput').focus(),80);
+}
+function closePCModal() { document.getElementById('pcModal').classList.remove('show'); }
+function doPriceCheck(v) {
+  const p = PRODUCTS.find(pr=>pr.name.toLowerCase().includes(v.toLowerCase())||pr.bc===v);
+  const r=document.getElementById('pcResult'), ab=document.getElementById('pcAddBtn');
+  if (p&&v.length>1) {
+    state.pcProd=p;
+    r.innerHTML=`<div class="pc-result"><div class="pc-icon">${p.icon}</div><div class="pc-name">${p.name}</div><div class="pc-price">${f(p.price)}${p.wt?'/kg':''}</div><div class="pc-meta">Barcode: ${p.bc} · Category: ${p.cat}${p.wt?' · Sold by weight':''}</div></div>`;
+    ab.style.display='';
+  } else {
+    state.pcProd=null;
+    r.innerHTML=v.length>0?'<div style="text-align:center;color:var(--text-muted);font-size:13px;padding:24px 0">Product not found</div>':'<div style="text-align:center;color:var(--text-faint);font-size:13px;padding:24px 0">Scan a barcode or type a product name</div>';
+    ab.style.display='none';
+  }
+}
+function addFromPC() { if(state.pcProd){addToCart(state.pcProd);closePCModal();toast(state.pcProd.name+' added to cart');} }
+
+// ─ LANG ─
+function setLang(l,btn) {
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  toast('Language switched to '+l);
+}
+function togglePrintLang(el) { el.classList.toggle('active'); }
+
+// ─ TOAST ─
+let toastTimer;
+function toast(msg) {
+  const t=document.getElementById('toastEl');
+  document.getElementById('toastMsg').textContent=msg;
+  t.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
+}
+
+// ─ CLOCK ─
+function updateClock() {
+  const n=new Date();
+  const s=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
+}
+updateClock(); setInterval(updateClock,30000);
+
+function renderAll() { renderTabs(); renderProducts(document.getElementById('searchInput').value, state.curCat); renderCart(); }
+
+renderAll();
+</script>
+</body>
+</html>

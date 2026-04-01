@@ -54,7 +54,7 @@ tests/
    - `dotnet build`  
    The WPF project sets `EnableWindowsTargeting` so it can compile on non-Windows machines; **running the POS UI requires Windows** (WPF).
 4. **Run tests:** `dotnet test`
-5. **Run the desktop app (Windows):** set `POS.Wpf` as startup project and run, or `dotnet run --project src/POS.Wpf/POS.Wpf.csproj`
+5. **Run the desktop app (Windows):** set `POS.Wpf` as startup project and run, or `dotnet run --project src/POS.Wpf/POS.Wpf.csproj`. On first launch, sign in with the seeded accounts **`cashier` / `cashier`** or **`admin` / `admin`** (change these in production).
 6. **EF Core CLI** (new migrations): `dotnet tool install dotnet-ef --global --version 8.0.11` (or align with your EF package version). Create migrations from repo root:
    - `dotnet ef migrations add <Name> --project src/POS.Infrastructure/POS.Infrastructure.csproj --startup-project src/POS.Infrastructure/POS.Infrastructure.csproj --output-dir Data/Migrations`
 

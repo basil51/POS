@@ -1,0 +1,14 @@
+using POS.Application.Models;
+
+namespace POS.Application.Abstractions;
+
+public interface IProductCatalogService
+{
+    Task<IReadOnlyList<CategoryDto>> GetCategoriesAsync(CancellationToken cancellationToken = default);
+    Task<CategoryDto> CreateCategoryAsync(string name, CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<ProductListItemDto>> SearchProductsAsync(string? query, Guid? categoryId = null, CancellationToken cancellationToken = default);
+    Task<ProductEditDto?> GetProductForEditAsync(Guid id, CancellationToken cancellationToken = default);
+    Task<ProductEditDto> CreateProductAsync(ProductEditDto input, CancellationToken cancellationToken = default);
+    Task<ProductEditDto> UpdateProductAsync(ProductEditDto input, CancellationToken cancellationToken = default);
+    Task DeleteProductAsync(Guid id, CancellationToken cancellationToken = default);
+}

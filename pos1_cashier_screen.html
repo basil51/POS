@@ -1,0 +1,344 @@
+
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+#pos { position: relative; display: flex; flex-direction: column; height: 730px; background: var(--color-background-tertiary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); overflow: hidden; font-family: var(--font-sans); font-size: 13px; color: var(--color-text-primary); }
+.ph { display: flex; align-items: center; height: 48px; padding: 0 14px; background: var(--color-background-primary); border-bottom: 0.5px solid var(--color-border-tertiary); gap: 8px; flex-shrink: 0; }
+.ph-logo { font-size: 14px; font-weight: 500; }
+.ph-logo span { color: #0F6E56; }
+.ph-div { width: 0.5px; height: 20px; background: var(--color-border-tertiary); margin: 0 4px; }
+.ph-spacer { flex: 1; }
+.lbtn { padding: 4px 9px; border-radius: var(--border-radius-md); font-size: 11px; font-weight: 500; cursor: pointer; border: 0.5px solid var(--color-border-secondary); background: transparent; color: var(--color-text-secondary); }
+.lbtn.on { background: var(--color-background-secondary); color: var(--color-text-primary); border-color: var(--color-border-primary); }
+.ph-time { font-size: 12px; color: var(--color-text-secondary); font-variant-numeric: tabular-nums; min-width: 36px; text-align: center; }
+.ph-badge { display: flex; align-items: center; gap: 5px; font-size: 12px; color: var(--color-text-secondary); padding: 4px 10px; border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); }
+.ph-dot { width: 6px; height: 6px; border-radius: 50%; background: #0F6E56; }
+.tb { display: flex; align-items: flex-end; height: 38px; padding: 0 10px; background: var(--color-background-secondary); border-bottom: 0.5px solid var(--color-border-tertiary); gap: 3px; flex-shrink: 0; }
+.tab { display: flex; align-items: center; gap: 5px; padding: 0 11px; height: 30px; border-radius: 6px 6px 0 0; cursor: pointer; font-size: 11px; font-weight: 500; border: 0.5px solid transparent; border-bottom: none; position: relative; bottom: -1px; color: var(--color-text-secondary); white-space: nowrap; }
+.tab.on { background: var(--color-background-primary); border-color: var(--color-border-tertiary); color: var(--color-text-primary); }
+.tab.hold-tab { color: var(--color-text-warning); }
+.tind { width: 5px; height: 5px; border-radius: 50%; }
+.tind.g { background: #0F6E56; } .tind.a { background: #BA7517; } .tind.n { background: var(--color-border-secondary); }
+.tx { margin-left: 2px; color: var(--color-text-tertiary); font-size: 13px; line-height: 1; }
+.tx:hover { color: var(--color-text-danger); }
+.newtab { padding: 0 10px; height: 28px; display: flex; align-items: center; font-size: 11px; color: #0F6E56; cursor: pointer; font-weight: 500; border-radius: 6px; margin-bottom: 1px; align-self: center; white-space: nowrap; }
+.newtab:hover { background: var(--color-background-primary); }
+.pm { display: flex; flex: 1; overflow: hidden; }
+.pl { width: 236px; flex-shrink: 0; background: var(--color-background-primary); border-right: 0.5px solid var(--color-border-tertiary); display: flex; flex-direction: column; }
+.pl-s { padding: 8px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.pl-s input { width: 100%; padding: 7px 10px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); background: var(--color-background-secondary); color: var(--color-text-primary); font-size: 12px; }
+.pl-s input:focus { outline: none; border-color: #0F6E56; }
+.pl-c { display: flex; gap: 4px; flex-wrap: wrap; padding: 6px 8px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.cbtn { padding: 3px 8px; border-radius: 20px; font-size: 11px; font-weight: 500; cursor: pointer; border: 0.5px solid var(--color-border-tertiary); background: transparent; color: var(--color-text-secondary); }
+.cbtn.on { background: #0F6E56; color: white; border-color: #0F6E56; }
+.pl-g { flex: 1; overflow-y: auto; padding: 6px; display: grid; grid-template-columns: 1fr 1fr; gap: 5px; align-content: start; }
+.pb { padding: 10px 6px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); cursor: pointer; text-align: center; display: flex; flex-direction: column; gap: 3px; }
+.pb:hover { background: var(--color-background-tertiary); border-color: #0F6E56; }
+.pb:active { opacity: 0.75; }
+.pb-ic { font-size: 16px; }
+.pb-nm { font-size: 11px; font-weight: 500; color: var(--color-text-primary); }
+.pb-pr { font-size: 11px; color: var(--color-text-secondary); }
+.pc-panel { flex: 1; display: flex; flex-direction: column; background: var(--color-background-tertiary); min-width: 0; }
+.inv-hdr { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: var(--color-background-primary); border-bottom: 0.5px solid var(--color-border-tertiary); flex-shrink: 0; }
+.inv-num { font-size: 12px; font-weight: 500; }
+.inv-st { font-size: 11px; color: var(--color-text-secondary); margin-top: 1px; }
+.inv-dt { font-size: 11px; color: var(--color-text-secondary); }
+.items-area { flex: 1; overflow-y: auto; }
+.inv-t { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.inv-t th { font-size: 11px; font-weight: 500; color: var(--color-text-secondary); text-align: left; padding: 7px 10px; background: var(--color-background-secondary); border-bottom: 0.5px solid var(--color-border-tertiary); position: sticky; top: 0; z-index: 1; text-transform: uppercase; letter-spacing: 0.3px; }
+.inv-t td { padding: 10px 10px; border-bottom: 0.5px solid var(--color-border-tertiary); font-size: 12px; vertical-align: middle; }
+.irow { cursor: pointer; }
+.irow:hover td { background: var(--color-background-primary); }
+.irow.sel td { background: var(--color-background-info); }
+.irow.sel .inm { color: var(--color-text-info); }
+.delbtn { width: 22px; height: 22px; border-radius: var(--border-radius-md); border: none; background: transparent; color: var(--color-text-danger); cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; line-height: 1; }
+.delbtn:hover { background: var(--color-background-danger); }
+.qcell { display: flex; align-items: center; gap: 4px; }
+.qch { width: 18px; height: 18px; border: 0.5px solid var(--color-border-secondary); border-radius: 4px; cursor: pointer; background: var(--color-background-primary); font-size: 12px; display: flex; align-items: center; justify-content: center; color: var(--color-text-secondary); }
+.qch:hover { background: var(--color-background-secondary); }
+.empty-i { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px; color: var(--color-text-tertiary); font-size: 13px; gap: 6px; }
+.totals { padding: 10px 14px; background: var(--color-background-primary); border-top: 0.5px solid var(--color-border-tertiary); flex-shrink: 0; }
+.tr { display: flex; justify-content: space-between; font-size: 12px; color: var(--color-text-secondary); padding: 2px 0; }
+.tr.grand { font-size: 18px; font-weight: 500; color: var(--color-text-primary); padding-top: 7px; margin-top: 4px; border-top: 0.5px solid var(--color-border-secondary); }
+.paybtn { width: 100%; padding: 12px; margin-top: 8px; background: #0F6E56; color: white; border: none; border-radius: var(--border-radius-md); font-size: 14px; font-weight: 500; cursor: pointer; }
+.paybtn:hover { background: #085041; }
+.paybtn:disabled { background: var(--color-background-secondary); color: var(--color-text-tertiary); cursor: not-allowed; }
+.pr { width: 178px; flex-shrink: 0; background: var(--color-background-primary); border-left: 0.5px solid var(--color-border-tertiary); display: flex; flex-direction: column; padding: 8px; gap: 6px; }
+.nplbl { font-size: 11px; color: var(--color-text-secondary); }
+.npdisp { background: var(--color-background-secondary); border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); padding: 7px 10px; font-size: 18px; font-weight: 500; text-align: right; color: var(--color-text-primary); min-height: 38px; }
+.npg { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 4px; }
+.nb { padding: 10px 4px; background: var(--color-background-secondary); border: 0.5px solid var(--color-border-tertiary); border-radius: var(--border-radius-md); font-size: 14px; font-weight: 500; cursor: pointer; text-align: center; color: var(--color-text-primary); }
+.nb:hover { background: var(--color-background-tertiary); }
+.nb:active { transform: scale(0.94); }
+.nb.bsp { color: var(--color-text-danger); font-size: 12px; }
+.asep { height: 0.5px; background: var(--color-border-tertiary); }
+.abt { width: 100%; padding: 8px; border-radius: var(--border-radius-md); font-size: 11px; font-weight: 500; cursor: pointer; text-align: center; border: 0.5px solid var(--color-border-tertiary); background: var(--color-background-secondary); color: var(--color-text-primary); }
+.abt:hover { background: var(--color-background-tertiary); }
+.abt.inf { background: var(--color-background-info); color: var(--color-text-info); border-color: var(--color-border-info); }
+.abt.wrn { background: var(--color-background-warning); color: var(--color-text-warning); border-color: var(--color-border-warning); }
+.abt.dng { background: var(--color-background-danger); color: var(--color-text-danger); border-color: var(--color-border-danger); }
+.mov { display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.42); z-index: 50; align-items: center; justify-content: center; }
+.mov.show { display: flex; }
+.mbox { background: var(--color-background-primary); border-radius: var(--border-radius-lg); border: 0.5px solid var(--color-border-tertiary); width: 360px; max-width: 90%; }
+.mh { display: flex; align-items: center; justify-content: space-between; padding: 14px 16px; border-bottom: 0.5px solid var(--color-border-tertiary); }
+.mhtl { font-size: 14px; font-weight: 500; }
+.mcl { width: 26px; height: 26px; border: none; background: transparent; cursor: pointer; color: var(--color-text-secondary); font-size: 16px; display: flex; align-items: center; justify-content: center; border-radius: var(--border-radius-md); }
+.mcl:hover { background: var(--color-background-secondary); color: var(--color-text-danger); }
+.mb { padding: 14px 16px; }
+.mf { padding: 10px 16px; border-top: 0.5px solid var(--color-border-tertiary); display: flex; gap: 8px; justify-content: flex-end; }
+.mbt { padding: 8px 14px; border-radius: var(--border-radius-md); font-size: 12px; font-weight: 500; cursor: pointer; border: 0.5px solid var(--color-border-secondary); background: var(--color-background-secondary); color: var(--color-text-primary); }
+.mbt:hover { background: var(--color-background-tertiary); }
+.mbt.pri { background: #0F6E56; color: white; border-color: #0F6E56; }
+.mbt.pri:hover { background: #085041; }
+.pcr { background: var(--color-background-secondary); border-radius: var(--border-radius-md); border: 0.5px solid var(--color-border-tertiary); padding: 16px; text-align: center; }
+.pcpn { font-size: 15px; font-weight: 500; margin-bottom: 4px; }
+.pcpp { font-size: 28px; font-weight: 500; color: #0F6E56; }
+.pmeth { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+.pmt { padding: 12px; border: 0.5px solid var(--color-border-secondary); border-radius: var(--border-radius-md); cursor: pointer; text-align: center; background: var(--color-background-secondary); }
+.pmt.on { border-color: #0F6E56; border-width: 2px; background: var(--color-background-primary); }
+.pmt:hover { background: var(--color-background-tertiary); }
+.pmic { font-size: 20px; margin-bottom: 3px; }
+.pmn { font-size: 11px; font-weight: 500; color: var(--color-text-primary); }
+.chgrow { display: flex; justify-content: space-between; padding: 5px 0; font-size: 12px; }
+.chgrow.chg { font-weight: 500; color: #0F6E56; }
+#toast { display: none; position: absolute; top: 58px; right: 14px; background: #0F6E56; color: white; padding: 10px 14px; border-radius: var(--border-radius-md); font-size: 12px; font-weight: 500; z-index: 100; }
+.discount-badge { font-size: 10px; color: var(--color-text-warning); background: var(--color-background-warning); padding: 1px 5px; border-radius: 10px; }
+</style>
+
+<div id="pos">
+  <div class="ph">
+    <span class="ph-logo">Smart<span>POS</span></span>
+    <div class="ph-div"></div>
+    <div style="display:flex;gap:2px" id="lgrp">
+      <button class="lbtn on" onclick="setLang('EN')">EN</button>
+      <button class="lbtn" onclick="setLang('AR')">AR</button>
+      <button class="lbtn" onclick="setLang('HE')">HE</button>
+    </div>
+    <div class="ph-spacer"></div>
+    <div class="ph-badge"><div class="ph-dot"></div><span id="clock">--:--</span></div>
+    <div class="ph-badge" style="gap:6px">
+      <div style="width:26px;height:26px;border-radius:50%;background:var(--color-background-info);color:var(--color-text-info);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500">AH</div>
+      <span>Ahmad H.</span>
+    </div>
+  </div>
+
+  <div class="tb" id="tbar"></div>
+
+  <div class="pm">
+    <div class="pl">
+      <div class="pl-s"><input type="text" id="srch" placeholder="Search or scan barcode..." oninput="filt(this.value)"></div>
+      <div class="pl-c" id="catbar">
+        <button class="cbtn on" onclick="fcat('All',this)">All</button>
+        <button class="cbtn" onclick="fcat('Dairy',this)">Dairy</button>
+        <button class="cbtn" onclick="fcat('Bakery',this)">Bakery</button>
+        <button class="cbtn" onclick="fcat('Produce',this)">Produce</button>
+        <button class="cbtn" onclick="fcat('Beverages',this)">Beverages</button>
+        <button class="cbtn" onclick="fcat('Staples',this)">Staples</button>
+      </div>
+      <div class="pl-g" id="pgrid"></div>
+    </div>
+
+    <div class="pc-panel">
+      <div class="inv-hdr">
+        <div><div class="inv-num" id="invnum">Invoice #001</div><div class="inv-st" id="invst">Active · 0 items</div></div>
+        <div class="inv-dt" id="invdt"></div>
+      </div>
+      <div class="items-area" id="iarea"></div>
+      <div class="totals">
+        <div class="tr"><span id="lsub">Subtotal</span><span id="vsub">₪ 0.00</span></div>
+        <div class="tr"><span id="ltax">VAT (17%)</span><span id="vtax">₪ 0.00</span></div>
+        <div class="tr" style="font-size:11px"><span id="litems">0 items</span><span id="vdisc" style="color:var(--color-text-success)"></span></div>
+        <div class="tr grand"><span id="ltot">Total</span><span id="vtot">₪ 0.00</span></div>
+        <button class="paybtn" id="paybtn" onclick="showM('pay')">Pay Now</button>
+      </div>
+    </div>
+
+    <div class="pr">
+      <div class="nplbl" id="nplbl">Quantity / Barcode</div>
+      <div class="npdisp" id="npd">1</div>
+      <div class="npg">
+        <button class="nb" onclick="ni('7')">7</button><button class="nb" onclick="ni('8')">8</button><button class="nb" onclick="ni('9')">9</button>
+        <button class="nb" onclick="ni('4')">4</button><button class="nb" onclick="ni('5')">5</button><button class="nb" onclick="ni('6')">6</button>
+        <button class="nb" onclick="ni('1')">1</button><button class="nb" onclick="ni('2')">2</button><button class="nb" onclick="ni('3')">3</button>
+        <button class="nb" onclick="ni('.')">.</button><button class="nb" onclick="ni('0')">0</button><button class="nb bsp" onclick="nbsp()">⌫</button>
+      </div>
+      <div class="asep"></div>
+      <button class="abt inf" id="bpc" onclick="showM('pc')">Price Check</button>
+      <button class="abt wrn" id="bhold" onclick="holdInv()">Hold Invoice</button>
+      <button class="abt" id="bdisc" onclick="doDiscount()">Apply Discount</button>
+      <button class="abt dng" id="bdel" onclick="delSel()">Remove Item</button>
+      <div class="asep"></div>
+      <button class="abt" id="bcust" onclick="custDisp()" style="font-size:11px">Customer Display</button>
+    </div>
+  </div>
+
+  <div class="mov" id="mpc">
+    <div class="mbox">
+      <div class="mh"><span class="mhtl">Price Check</span><button class="mcl" onclick="hideM('pc')">✕</button></div>
+      <div class="mb">
+        <input type="text" id="pcinp" placeholder="Scan barcode or type product name..." style="width:100%;padding:8px 10px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);font-size:12px;margin-bottom:12px" oninput="doPc(this.value)">
+        <div id="pcres"><div style="text-align:center;color:var(--color-text-tertiary);font-size:13px;padding:20px 0">Scan or type a product name to check its price</div></div>
+      </div>
+      <div class="mf">
+        <button class="mbt" onclick="hideM('pc')">Close</button>
+        <button class="mbt pri" id="pcadd" style="display:none" onclick="addFromPc()">+ Add to Invoice</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="mov" id="mpay">
+    <div class="mbox" style="width:400px">
+      <div class="mh"><span class="mhtl">Process Payment</span><button class="mcl" onclick="hideM('pay')">✕</button></div>
+      <div class="mb">
+        <div class="pmeth">
+          <div class="pmt on" onclick="selPm('cash',this)"><div class="pmic">💵</div><div class="pmn">Cash</div></div>
+          <div class="pmt" onclick="selPm('card',this)"><div class="pmic">💳</div><div class="pmn">Card</div></div>
+          <div class="pmt" onclick="selPm('bit',this)"><div class="pmic">📱</div><div class="pmn">Bit / PayBox</div></div>
+          <div class="pmt" onclick="selPm('check',this)"><div class="pmic">📄</div><div class="pmn">Check</div></div>
+        </div>
+        <div id="cashsec">
+          <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:5px">Amount Received (₪)</div>
+          <input type="number" id="cashin" style="width:100%;padding:10px;font-size:18px;border:0.5px solid var(--color-border-secondary);border-radius:var(--border-radius-md);background:var(--color-background-secondary);color:var(--color-text-primary);text-align:right;margin-bottom:8px" oninput="calcChg()" placeholder="0.00">
+          <div class="chgrow"><span style="color:var(--color-text-secondary)">Total Due</span><span id="ptot">₪ 0.00</span></div>
+          <div class="chgrow chg"><span>Change</span><span id="pchg">₪ 0.00</span></div>
+        </div>
+        <div id="cardsec" style="display:none;padding:14px;text-align:center;background:var(--color-background-secondary);border-radius:var(--border-radius-md)">
+          <div style="font-size:13px;color:var(--color-text-secondary)">Present card to terminal</div>
+          <div style="font-size:22px;font-weight:500;margin-top:6px" id="ptot2">₪ 0.00</div>
+        </div>
+        <div style="margin-top:12px;padding-top:10px;border-top:0.5px solid var(--color-border-tertiary)">
+          <div style="font-size:11px;color:var(--color-text-secondary);margin-bottom:6px;text-transform:uppercase;letter-spacing:0.4px">Print invoice language</div>
+          <div style="display:flex;gap:12px">
+            <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" checked id="par"> Arabic</label>
+            <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" id="pen"> English</label>
+            <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer"><input type="checkbox" id="phe"> Hebrew</label>
+          </div>
+        </div>
+      </div>
+      <div class="mf">
+        <button class="mbt" onclick="hideM('pay')">Cancel</button>
+        <button class="mbt pri" onclick="completePay()">Complete & Print</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast">Payment complete · Invoice printed</div>
+</div>
+
+<script>
+const prods = [
+  {id:1,name:'Bread',price:6.50,cat:'Bakery',ic:'🍞',bc:'001'},
+  {id:2,name:'Milk 1L',price:5.80,cat:'Dairy',ic:'🥛',bc:'002'},
+  {id:3,name:'Yellow Cheese',price:18.90,cat:'Dairy',ic:'🧀',bc:'003'},
+  {id:4,name:'Apples 1kg',price:8.50,cat:'Produce',ic:'🍎',bc:'004',wt:true},
+  {id:5,name:'Coffee 200g',price:32.00,cat:'Beverages',ic:'☕',bc:'005'},
+  {id:6,name:'Water 1.5L',price:4.20,cat:'Beverages',ic:'💧',bc:'006'},
+  {id:7,name:'Rice 1kg',price:9.90,cat:'Staples',ic:'🌾',bc:'007'},
+  {id:8,name:'Olive Oil 750ml',price:24.50,cat:'Staples',ic:'🫙',bc:'008'},
+  {id:9,name:'Yogurt 500g',price:7.30,cat:'Dairy',ic:'🥣',bc:'009'},
+  {id:10,name:'Tomatoes 1kg',price:6.80,cat:'Produce',ic:'🍅',bc:'010',wt:true},
+  {id:11,name:'Pita Bread x6',price:9.90,cat:'Bakery',ic:'🫓',bc:'011'},
+  {id:12,name:'Orange Juice 1L',price:12.50,cat:'Beverages',ic:'🍊',bc:'012'},
+];
+const T = {
+  EN:{pay:'Pay Now',sub:'Subtotal',tax:'VAT (17%)',tot:'Total',srch:'Search or scan barcode...',qty:'Quantity / Barcode',hold:'Hold Invoice',resume:'Resume Invoice',pc:'Price Check',disc:'Apply Discount',rem:'Remove Item',cd:'Customer Display',act:'Active',hld:'On Hold',itm:'items',new:'+ New'},
+  AR:{pay:'ادفع الآن',sub:'المجموع الفرعي',tax:'ضريبة (17%)',tot:'الإجمالي',srch:'بحث أو مسح...',qty:'الكمية',hold:'تعليق الفاتورة',resume:'استئناف الفاتورة',pc:'فحص السعر',disc:'تطبيق خصم',rem:'حذف صنف',cd:'شاشة الزبون',act:'نشط',hld:'معلق',itm:'أصناف',new:'+ جديد'},
+  HE:{pay:'שלם עכשיו',sub:'סכום ביניים',tax:'מע"מ (17%)',tot:'סה"כ',srch:'חפש או סרוק ברקוד...',qty:'כמות',hold:'השהה חשבונית',resume:'חדש חשבונית',pc:'בדיקת מחיר',disc:'הנחה',rem:'הסר פריט',cd:'מסך לקוח',act:'פעיל',hld:'מושהה',itm:'פריטים',new:'+ חדש'},
+};
+let lang='EN', aTab=0, npv='1', selIdx=-1, curCat='All', pcProd=null, pm='cash';
+let invs=[
+  {id:1,num:'#001',items:[{p:prods[0],q:2,pr:6.50},{p:prods[2],q:1,pr:18.90}],st:'active',disc:0},
+  {id:2,num:'#002',items:[],st:'active',disc:0},
+  {id:3,num:'#003',items:[{p:prods[1],q:3,pr:5.80}],st:'hold',disc:0},
+];
+const f=n=>'₪ '+n.toFixed(2);
+const gi=()=>invs[aTab];
+function totals(iv){const s=iv.items.reduce((a,i)=>a+i.q*i.pr,0);const d=iv.disc||0;const sub=s*(1-d/100);const tax=sub*0.17;return{sub,tax,tot:sub+tax,d};}
+function clock(){const n=new Date();document.getElementById('clock').textContent=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');}
+clock();setInterval(clock,15000);
+function rTabs(){
+  const tb=document.getElementById('tbar');tb.innerHTML='';
+  invs.forEach((iv,i)=>{
+    const d=document.createElement('div');
+    const hold=iv.st==='hold';
+    d.className='tab'+(i===aTab?' on':'')+(hold?' hold-tab':'');
+    const col=hold?'a':(i===aTab?'g':'n');
+    d.innerHTML=`<div class="tind ${col}"></div>${iv.num}<span class="tx" onclick="closeTab(event,${i})">✕</span>`;
+    d.onclick=e=>{if(!e.target.classList.contains('tx'))swTab(i);};
+    tb.appendChild(d);
+  });
+  const nt=document.createElement('div');nt.className='newtab';nt.textContent=T[lang].new;nt.onclick=addTab;tb.appendChild(nt);
+}
+function rProds(q='',c='All'){
+  const g=document.getElementById('pgrid');g.innerHTML='';
+  prods.filter(p=>(c==='All'||p.cat===c)&&(p.name.toLowerCase().includes(q.toLowerCase())||p.bc===q)).forEach(p=>{
+    const d=document.createElement('div');d.className='pb';
+    d.innerHTML=`<div class="pb-ic">${p.ic}</div><div class="pb-nm">${p.name}</div><div class="pb-pr">${f(p.pr)}${p.wt?'/kg':''}</div>`;
+    d.onclick=()=>addP(p);g.appendChild(d);
+  });
+}
+function rInv(){
+  const iv=gi();const t=totals(iv);
+  document.getElementById('invnum').textContent='Invoice '+iv.num;
+  document.getElementById('invst').textContent=(iv.st==='hold'?T[lang].hld:T[lang].act)+' · '+iv.items.length+' '+T[lang].itm;
+  const now=new Date();document.getElementById('invdt').textContent='Today, '+String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+  const ar=document.getElementById('iarea');
+  if(!iv.items.length){ar.innerHTML=`<div class="empty-i"><span style="font-size:28px">🧾</span><span>No items added yet</span><span style="font-size:11px;color:var(--color-text-tertiary)">Select from the left or scan a barcode</span></div>`;}
+  else{
+    ar.innerHTML=`<table class="inv-t"><thead><tr><th style="width:36%">Product</th><th style="width:20%">Qty</th><th style="width:18%">Unit</th><th style="width:20%">Total</th><th style="width:6%"></th></tr></thead><tbody id="itbd"></tbody></table>`;
+    const tb=document.getElementById('itbd');
+    iv.items.forEach((it,i)=>{
+      const tr=document.createElement('tr');tr.className='irow'+(i===selIdx?' sel':'');tr.onclick=()=>selIt(i);
+      tr.innerHTML=`<td><span class="inm" style="font-weight:500">${it.p.name}</span>${it.p.wt?'<br><span style="font-size:10px;color:var(--color-text-secondary)">by weight</span>':''}</td><td><div class="qcell"><button class="qch" onclick="cq(event,${i},-1)">−</button><span style="min-width:22px;text-align:center">${it.q%1===0?it.q:it.q.toFixed(2)}</span><button class="qch" onclick="cq(event,${i},1)">+</button></div></td><td>${f(it.pr)}</td><td style="font-weight:500">${f(it.q*it.pr)}</td><td><button class="delbtn" onclick="delIt(event,${i})">×</button></td>`;
+      tb.appendChild(tr);
+    });
+  }
+  document.getElementById('lsub').textContent=T[lang].sub;document.getElementById('ltax').textContent=T[lang].tax;document.getElementById('ltot').textContent=T[lang].tot;
+  document.getElementById('vsub').textContent=f(t.sub);document.getElementById('vtax').textContent=f(t.tax);document.getElementById('vtot').textContent=f(t.tot);
+  document.getElementById('litems').textContent=iv.items.length+' '+T[lang].itm;
+  document.getElementById('vdisc').textContent=t.d>0?'Discount: '+t.d+'%':'';
+  const pb=document.getElementById('paybtn');pb.textContent=T[lang].pay;pb.disabled=!iv.items.length;
+  document.getElementById('ptot').textContent=f(t.tot);document.getElementById('ptot2').textContent=f(t.tot);
+}
+function rActs(){
+  document.getElementById('bpc').textContent=T[lang].pc;
+  const iv=gi();document.getElementById('bhold').textContent=iv.st==='hold'?T[lang].resume:T[lang].hold;
+  document.getElementById('bdisc').textContent=T[lang].disc;
+  document.getElementById('bdel').textContent=T[lang].rem;
+  document.getElementById('bcust').textContent=T[lang].cd;
+  document.getElementById('srch').placeholder=T[lang].srch;
+  document.getElementById('nplbl').textContent=T[lang].qty;
+}
+function rAll(){rTabs();rProds(document.getElementById('srch').value,curCat);rInv();rActs();}
+function swTab(i){aTab=i;selIdx=-1;npv='1';document.getElementById('npd').textContent='1';rAll();}
+function addTab(){const n=String(invs.length+1).padStart(3,'0');invs.push({id:invs.length+1,num:'#'+n,items:[],st:'active',disc:0});aTab=invs.length-1;rAll();}
+function closeTab(e,i){e.stopPropagation();if(invs.length===1)return;invs.splice(i,1);if(aTab>=invs.length)aTab=invs.length-1;rAll();}
+function addP(p){const iv=gi();const q=parseFloat(npv)||1;const ex=iv.items.find(x=>x.p.id===p.id);if(ex)ex.q=parseFloat((ex.q+q).toFixed(3));else iv.items.push({p,q,pr:p.pr});selIdx=iv.items.findIndex(x=>x.p.id===p.id);npv='1';document.getElementById('npd').textContent='1';rAll();}
+function delIt(e,i){e.stopPropagation();const iv=gi();iv.items.splice(i,1);if(selIdx>=iv.items.length)selIdx=-1;rAll();}
+function selIt(i){selIdx=selIdx===i?-1:i;rInv();}
+function cq(e,i,d){e.stopPropagation();const it=gi().items[i];it.q=Math.max(0.1,parseFloat((it.q+d).toFixed(3)));rAll();}
+function holdInv(){const iv=gi();iv.st=iv.st==='hold'?'active':'hold';rAll();}
+function delSel(){if(selIdx<0)return;const iv=gi();iv.items.splice(selIdx,1);selIdx=-1;rAll();}
+function doDiscount(){const v=prompt('Discount % for '+(selIdx>=0?gi().items[selIdx].p.name:'entire invoice')+':');if(!v||isNaN(v))return;const pct=Math.min(100,Math.max(0,parseFloat(v)));if(selIdx>=0){gi().items[selIdx].pr=prods.find(x=>x.id===gi().items[selIdx].p.id).pr*(1-pct/100);}else{gi().disc=pct;}rAll();}
+function ni(c){if(c==='.'&&npv.includes('.'))return;if(npv==='1'&&c!=='.')npv=c;else npv+=c;if(npv.length>7)npv=npv.slice(0,7);document.getElementById('npd').textContent=npv;if(selIdx>=0){const q=parseFloat(npv);if(!isNaN(q)&&q>0){gi().items[selIdx].q=q;rInv();}}}
+function nbsp(){npv=npv.length>1?npv.slice(0,-1):'1';document.getElementById('npd').textContent=npv;}
+function filt(v){rProds(v,curCat);}
+function fcat(c,b){curCat=c;document.querySelectorAll('.cbtn').forEach(x=>x.classList.remove('on'));b.classList.add('on');rProds(document.getElementById('srch').value,c);}
+function setLang(l){lang=l;document.querySelectorAll('.lbtn').forEach(b=>b.classList.toggle('on',b.textContent===l));rAll();}
+function showM(t){
+  if(t==='pay'){const tv=totals(gi());document.getElementById('ptot').textContent=f(tv.tot);document.getElementById('ptot2').textContent=f(tv.tot);document.getElementById('cashin').value='';document.getElementById('pchg').textContent=f(0);document.getElementById('mpay').classList.add('show');}
+  else{document.getElementById('pcinp').value='';document.getElementById('pcres').innerHTML='<div style="text-align:center;color:var(--color-text-tertiary);font-size:13px;padding:20px 0">Scan or type a product name to check its price</div>';document.getElementById('pcadd').style.display='none';pcProd=null;document.getElementById('mpc').classList.add('show');setTimeout(()=>document.getElementById('pcinp').focus(),80);}
+}
+function hideM(t){document.getElementById('m'+t).classList.remove('show');}
+function doPc(v){
+  const fd=prods.find(p=>p.name.toLowerCase().includes(v.toLowerCase())||p.bc===v);
+  const r=document.getElementById('pcres'),ab=document.getElementById('pcadd');
+  if(fd&&v.length>1){pcProd=fd;r.innerHTML=`<div class="pcr"><div style="font-size:24px;margin-bottom:6px">${fd.ic}</div><div class="pcpn">${fd.name}</div><div class="pcpp">${f(fd.pr)}${fd.wt?'/kg':''}</div><div style="font-size:11px;color:var(--color-text-secondary);margin-top:6px">In stock · Barcode: ${fd.bc}</div></div>`;ab.style.display='';}
+  else{pcProd=null;r.innerHTML=v.length>0?'<div style="text-align:center;color:var(--color-text-secondary);font-size:13px;padding:20px 0">Product not found</div>':'<div style="text-align:center;color:var(--color-text-tertiary);font-size:13px;padding:20px 0">Scan or type a product name to check its price</div>';ab.style.display='none';}
+}
+function addFromPc(){if(pcProd){addP(pcProd);hideM('pc');}}
+function selPm(m,el){pm=m;document.querySelectorAll('.pmt').forEach(b=>b.classList.remove('on'));el.classList.add('on');document.getElementById('cashsec').style.display=m==='cash'?'':'none';document.getElementById('cardsec').style.display=m==='cash'?'none':'';}
+function calcChg(){const r=parseFloat(document.getElementById('cashin').value)||0;const t=totals(gi());document.getElementById('pchg').textContent=f(Math.max(0,r-t.tot));}
+function completePay(){hideM('pay');gi().items=[];gi().st='active';gi().disc=0;selIdx=-1;rAll();const t=document.getElementById('toast');t.style.display='block';setTimeout(()=>t.style.display='none',2500);}
+function custDisp(){alert('Customer Display opens on secondary screen.\nShows: current items, running total, payment confirmation.');}
+rAll();
+</script>

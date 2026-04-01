@@ -2,4 +2,395 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              ShutdownMode="OnMainWindowClose">
+    <Application.Resources>
+        <ResourceDictionary>
+
+            <!-- ═══ Colour palette — warm neutrals matching pos_cashier.html ═══ -->
+            <SolidColorBrush x:Key="AccentBrush"        Color="#16A34A"/>
+            <SolidColorBrush x:Key="AccentDarkBrush"    Color="#15803D"/>
+            <SolidColorBrush x:Key="AccentLightBrush"   Color="#F0FDF4"/>
+            <SolidColorBrush x:Key="AccentMidBrush"     Color="#DCFCE7"/>
+            <SolidColorBrush x:Key="BgPrimaryBrush"     Color="#FFFFFF"/>
+            <SolidColorBrush x:Key="BgSecondaryBrush"   Color="#F5F5F4"/>
+            <SolidColorBrush x:Key="BgTertiaryBrush"    Color="#EDECEA"/>
+            <SolidColorBrush x:Key="PanelBorderBrush"   Color="#E7E5E4"/>
+            <SolidColorBrush x:Key="InputBorderBrush"   Color="#D6D3D1"/>
+            <SolidColorBrush x:Key="TextPrimaryBrush"   Color="#1C1917"/>
+            <SolidColorBrush x:Key="TextSecondaryBrush" Color="#78716C"/>
+            <SolidColorBrush x:Key="TextTertiaryBrush"  Color="#A8A29E"/>
+            <SolidColorBrush x:Key="DangerBrush"        Color="#DC2626"/>
+            <SolidColorBrush x:Key="DangerBgBrush"      Color="#FEF2F2"/>
+            <SolidColorBrush x:Key="WarnBrush"          Color="#D97706"/>
+            <SolidColorBrush x:Key="WarnBgBrush"        Color="#FFFBEB"/>
+            <SolidColorBrush x:Key="InfoBrush"          Color="#2563EB"/>
+            <SolidColorBrush x:Key="InfoBgBrush"        Color="#DBEAFE"/>
+
+            <!-- ═══ Converters ═══ -->
+            <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+
+            <!-- ═══ Icon Geometries (HeroIcons v1, 20×20 solid) ═══ -->
+            <Geometry x:Key="IconHome">M10.707 2.293a1 1 0 00-1.414 0l-7 7a1 1 0 001.414 1.414L4 10.414V17a1 1 0 001 1h3a1 1 0 001-1v-3h2v3a1 1 0 001 1h3a1 1 0 001-1v-6.586l.293.293a1 1 0 001.414-1.414l-7-7z</Geometry>
+            <Geometry x:Key="IconCustomers">M9 6a3 3 0 11-6 0 3 3 0 016 0z M17 6a3 3 0 11-6 0 3 3 0 016 0zM12.93 17c.046-.327.07-.66.07-1a6.97 6.97 0 00-1.5-4.33A5 5 0 0119 16v1h-6.07zM6 11a5 5 0 015 5v1H1v-1a5 5 0 015-5z</Geometry>
+            <Geometry x:Key="IconOrders">F0 M9 2a1 1 0 000 2h2a1 1 0 100-2H9z M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z</Geometry>
+            <Geometry x:Key="IconProducts">F0 M4 3a2 2 0 100 4h12a2 2 0 100-4H4z M3 8h14v7a2 2 0 01-2 2H5a2 2 0 01-2-2V8zm5 3a1 1 0 011-1h2a1 1 0 110 2H9a1 1 0 01-1-1z</Geometry>
+            <Geometry x:Key="IconReports">M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zM8 7a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zM14 4a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z</Geometry>
+            <Geometry x:Key="IconSettings">F0 M11.49 3.17c-.38-1.56-2.6-1.56-2.98 0a1.532 1.532 0 01-2.286.948c-1.372-.836-2.942.734-2.106 2.106.54.886.061 2.042-.947 2.287-1.561.379-1.561 2.6 0 2.978a1.532 1.532 0 01.947 2.287c-.836 1.372.734 2.942 2.106 2.106a1.532 1.532 0 012.287.947c.379 1.561 2.6 1.561 2.978 0a1.533 1.533 0 012.287-.947c1.372.836 2.942-.734 2.106-2.106a1.533 1.533 0 01.947-2.287c1.561-.379 1.561-2.6 0-2.978a1.532 1.532 0 01-.947-2.287c.836-1.372-.734-2.942-2.106-2.106a1.532 1.532 0 01-2.287-.947zM10 13a3 3 0 100-6 3 3 0 000 6z</Geometry>
+            <Geometry x:Key="IconLogout">F0 M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z</Geometry>
+            <Geometry x:Key="IconRefresh">F0 M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z</Geometry>
+            <Geometry x:Key="IconMonitor">F0 M3 5a2 2 0 012-2h10a2 2 0 012 2v8a2 2 0 01-2 2h-2.22l.123.489.804.804A1 1 0 0113 18H7a1 1 0 01-.707-1.707l.804-.804L7.22 15H5a2 2 0 01-2-2V5zm5.771 7H5V5h10v7H8.771z</Geometry>
+            <Geometry x:Key="IconTag">F0 M17.707 9.293a1 1 0 010 1.414l-7 7a1 1 0 01-1.414 0l-7-7A.997.997 0 012 10V5a3 3 0 013-3h5c.256 0 .512.098.707.293l7 7zM5 6a1 1 0 100-2 1 1 0 000 2z</Geometry>
+            <Geometry x:Key="IconPause">F0 M18 10a8 8 0 11-16 0 8 8 0 0116 0zM7 8a1 1 0 012 0v4a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v4a1 1 0 102 0V8a1 1 0 00-1-1z</Geometry>
+            <Geometry x:Key="IconCheck">F0 M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z</Geometry>
+            <Geometry x:Key="IconChevronRight">F0 M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z</Geometry>
+            <Geometry x:Key="IconChevronDown">F0 M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z</Geometry>
+            <Geometry x:Key="IconX">F0 M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z</Geometry>
+            <Geometry x:Key="IconCart">M3 1a1 1 0 000 2h1.22l.305 1.222a.997.997 0 00.01.042l1.358 5.43-.893.892C3.74 11.846 4.632 14 6.414 14H15a1 1 0 000-2H6.414l1-1H14a1 1 0 00.894-.553l3-6A1 1 0 0017 3H6.28l-.31-1.243A1 1 0 005 1H3zM16 16.5a1.5 1.5 0 11-3 0 1.5 1.5 0 013 0zM6.5 18a1.5 1.5 0 100-3 1.5 1.5 0 000 3z</Geometry>
+            <Geometry x:Key="IconNote">F0 M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4zm2 6a1 1 0 011-1h6a1 1 0 110 2H7a1 1 0 01-1-1zm1 3a1 1 0 100 2h6a1 1 0 100-2H7z</Geometry>
+            <Geometry x:Key="IconDiscount">F0 M5 2a2 2 0 00-2 2v14l3.5-2 3.5 2 3.5-2 3.5 2V4a2 2 0 00-2-2H5zm2.5 3a1.5 1.5 0 100 3 1.5 1.5 0 000-3zm6.207.293a1 1 0 00-1.414 0l-6 6a1 1 0 101.414 1.414l6-6a1 1 0 000-1.414zM12.5 10a1.5 1.5 0 100 3 1.5 1.5 0 000-3z</Geometry>
+            <Geometry x:Key="IconBarcode">F0 M3 4a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1V4zm2 2V5h1v1H5zM3 13a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1H4a1 1 0 01-1-1v-3zm2 2v-1h1v1H5zM13 3a1 1 0 00-1 1v3a1 1 0 001 1h3a1 1 0 001-1V4a1 1 0 00-1-1h-3zm1 2v1h1V5h-1zM11 13a1 1 0 011-1h3a1 1 0 011 1v3a1 1 0 01-1 1h-3a1 1 0 01-1-1v-3zm2 2v-1h1v1h-1z</Geometry>
+            <Geometry x:Key="IconSearch">F0 M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z</Geometry>
+            <Geometry x:Key="IconMoon">M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z</Geometry>
+            <Geometry x:Key="IconSun">F0 M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z</Geometry>
+
+            <!-- ═══ Base button (rounded, no chrome) ═══ -->
+            <Style x:Key="PosButtonBase" TargetType="Button">
+                <Setter Property="FontFamily"       Value="Segoe UI"/>
+                <Setter Property="FontSize"         Value="13"/>
+                <Setter Property="Cursor"           Value="Hand"/>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="BorderThickness"  Value="0"/>
+                <Setter Property="Padding"          Value="12,7"/>
+                <Setter Property="HorizontalContentAlignment" Value="Center"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Bdr"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="8"
+                                    Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                                  VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bdr" Property="Opacity" Value="0.85"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter TargetName="Bdr" Property="Opacity" Value="0.70"/>
+                                </Trigger>
+                                <Trigger Property="IsEnabled" Value="False">
+                                    <Setter TargetName="Bdr" Property="Opacity" Value="0.38"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Green primary -->
+            <Style x:Key="AccentButton" TargetType="Button" BasedOn="{StaticResource PosButtonBase}">
+                <Setter Property="Background"  Value="{DynamicResource AccentBrush}"/>
+                <Setter Property="Foreground"  Value="White"/>
+                <Setter Property="FontWeight"  Value="SemiBold"/>
+                <Setter Property="Padding"     Value="12,8"/>
+                <Setter Property="BorderThickness" Value="0"/>
+            </Style>
+
+            <!-- Ghost -->
+            <Style x:Key="GhostButton" TargetType="Button" BasedOn="{StaticResource PosButtonBase}">
+                <Setter Property="Background"      Value="{DynamicResource BgSecondaryBrush}"/>
+                <Setter Property="Foreground"      Value="{DynamicResource TextPrimaryBrush}"/>
+                <Setter Property="BorderBrush"     Value="{DynamicResource PanelBorderBrush}"/>
+                <Setter Property="BorderThickness" Value="0.5"/>
+                <Setter Property="Padding"         Value="10,6"/>
+            </Style>
+
+            <!-- Danger ghost -->
+            <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource PosButtonBase}">
+                <Setter Property="Background"      Value="{DynamicResource DangerBgBrush}"/>
+                <Setter Property="Foreground"      Value="{DynamicResource DangerBrush}"/>
+                <Setter Property="BorderBrush"     Value="{DynamicResource DangerBrush}"/>
+                <Setter Property="BorderThickness" Value="0.5"/>
+                <Setter Property="Padding"         Value="10,6"/>
+            </Style>
+
+            <!-- Inline qty +/- icon button -->
+            <Style x:Key="IconButton" TargetType="Button">
+                <Setter Property="Width"            Value="22"/>
+                <Setter Property="Height"           Value="22"/>
+                <Setter Property="Padding"          Value="0"/>
+                <Setter Property="FontSize"         Value="14"/>
+                <Setter Property="Cursor"           Value="Hand"/>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="Background"       Value="{DynamicResource BgSecondaryBrush}"/>
+                <Setter Property="Foreground"       Value="{DynamicResource TextSecondaryBrush}"/>
+                <Setter Property="BorderBrush"      Value="{DynamicResource PanelBorderBrush}"/>
+                <Setter Property="BorderThickness"  Value="0.5"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="5">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="{DynamicResource BgTertiaryBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter Property="Opacity" Value="0.7"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Qty +/- in expanded cart row (borderless, flat) -->
+            <Style x:Key="QtyButton" TargetType="Button">
+                <Setter Property="Width"            Value="28"/>
+                <Setter Property="Height"           Value="28"/>
+                <Setter Property="Padding"          Value="0"/>
+                <Setter Property="FontSize"         Value="16"/>
+                <Setter Property="Cursor"           Value="Hand"/>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="Background"       Value="Transparent"/>
+                <Setter Property="Foreground"       Value="{DynamicResource TextSecondaryBrush}"/>
+                <Setter Property="BorderThickness"  Value="0"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="{DynamicResource BgSecondaryBrush}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter Property="Opacity" Value="0.7"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Numpad key button -->
+            <Style x:Key="NumpadButton" TargetType="Button">
+                <Setter Property="Width"            Value="32"/>
+                <Setter Property="Height"           Value="30"/>
+                <Setter Property="FontSize"         Value="12"/>
+                <Setter Property="FontWeight"       Value="Medium"/>
+                <Setter Property="Cursor"           Value="Hand"/>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="Background"       Value="{DynamicResource BgPrimaryBrush}"/>
+                <Setter Property="Foreground"       Value="{DynamicResource TextPrimaryBrush}"/>
+                <Setter Property="BorderBrush"      Value="{DynamicResource PanelBorderBrush}"/>
+                <Setter Property="BorderThickness"  Value="0.5"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="5">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter Property="Background" Value="{DynamicResource BgSecondaryBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter Property="Opacity" Value="0.7"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- TextBox -->
+            <Style x:Key="PosTextBox" TargetType="TextBox">
+                <Setter Property="FontFamily"      Value="Segoe UI"/>
+                <Setter Property="FontSize"        Value="13"/>
+                <Setter Property="Foreground"      Value="{DynamicResource TextPrimaryBrush}"/>
+                <Setter Property="CaretBrush"      Value="{DynamicResource AccentBrush}"/>
+                <Setter Property="Padding"         Value="10,8"/>
+                <Setter Property="Background"      Value="{DynamicResource BgSecondaryBrush}"/>
+                <Setter Property="BorderBrush"     Value="{DynamicResource PanelBorderBrush}"/>
+                <Setter Property="BorderThickness" Value="0.5"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="TextBox">
+                            <Border Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="8">
+                                <ScrollViewer x:Name="PART_ContentHost"
+                                              Margin="{TemplateBinding Padding}"
+                                              VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsFocused" Value="True">
+                                    <Setter Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- ─── Sidebar nav button (light surface, 48×48 rounded) ─── -->
+            <Style x:Key="SidebarNavButton" TargetType="Button">
+                <Setter Property="Background"       Value="Transparent"/>
+                <Setter Property="Foreground"       Value="{DynamicResource TextSecondaryBrush}"/>
+                <Setter Property="BorderThickness"  Value="0"/>
+                <Setter Property="Width"            Value="48"/>
+                <Setter Property="Height"           Value="48"/>
+                <Setter Property="Margin"           Value="0,1"/>
+                <Setter Property="Padding"          Value="0"/>
+                <Setter Property="Cursor"           Value="Hand"/>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Bdr"
+                                    Background="{TemplateBinding Background}"
+                                    CornerRadius="8">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bdr" Property="Background" Value="{DynamicResource BgSecondaryBrush}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter Property="Opacity" Value="0.75"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Top-bar icon button (36×36 with border) -->
+            <Style x:Key="TopBarIconButton" TargetType="Button">
+                <Setter Property="Background"       Value="Transparent"/>
+                <Setter Property="Foreground"       Value="{DynamicResource TextSecondaryBrush}"/>
+                <Setter Property="BorderBrush"      Value="{DynamicResource PanelBorderBrush}"/>
+                <Setter Property="BorderThickness"  Value="0.5"/>
+                <Setter Property="Width"            Value="36"/>
+                <Setter Property="Height"           Value="36"/>
+                <Setter Property="Padding"          Value="0"/>
+                <Setter Property="Cursor"           Value="Hand"/>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="Bdr"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="6">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bdr" Property="Background" Value="{DynamicResource BgSecondaryBrush}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsPressed" Value="True">
+                                    <Setter Property="Opacity" Value="0.75"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Top-bar toggle button (dark-mode etc.) -->
+            <Style x:Key="TopBarToggleButton" TargetType="ToggleButton">
+                <Setter Property="Background"       Value="Transparent"/>
+                <Setter Property="Foreground"       Value="{DynamicResource TextSecondaryBrush}"/>
+                <Setter Property="BorderBrush"      Value="{DynamicResource PanelBorderBrush}"/>
+                <Setter Property="BorderThickness"  Value="0.5"/>
+                <Setter Property="Width"            Value="36"/>
+                <Setter Property="Height"           Value="36"/>
+                <Setter Property="Padding"          Value="0"/>
+                <Setter Property="Cursor"           Value="Hand"/>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ToggleButton">
+                            <Border x:Name="Bdr"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="6">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter TargetName="Bdr" Property="Background" Value="{DynamicResource AccentLightBrush}"/>
+                                    <Setter TargetName="Bdr" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource AccentBrush}"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bdr" Property="Background" Value="{DynamicResource BgSecondaryBrush}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- Lang pill toggle button -->
+            <Style x:Key="LangPillButton" TargetType="ToggleButton">
+                <Setter Property="Background"       Value="Transparent"/>
+                <Setter Property="Foreground"       Value="{DynamicResource TextSecondaryBrush}"/>
+                <Setter Property="BorderBrush"      Value="{DynamicResource PanelBorderBrush}"/>
+                <Setter Property="BorderThickness"  Value="0.5"/>
+                <Setter Property="Padding"          Value="8,3"/>
+                <Setter Property="FontSize"         Value="11"/>
+                <Setter Property="FontWeight"       Value="SemiBold"/>
+                <Setter Property="Cursor"           Value="Hand"/>
+                <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ToggleButton">
+                            <Border x:Name="Bdr"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="12"
+                                    Padding="{TemplateBinding Padding}">
+                                <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsChecked" Value="True">
+                                    <Setter TargetName="Bdr" Property="Background"  Value="{DynamicResource AccentBrush}"/>
+                                    <Setter TargetName="Bdr" Property="BorderBrush" Value="{DynamicResource AccentBrush}"/>
+                                    <Setter Property="Foreground" Value="White"/>
+                                </Trigger>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="Bdr" Property="BorderBrush" Value="{DynamicResource InputBorderBrush}"/>
+                                    <Setter Property="Foreground" Value="{DynamicResource TextPrimaryBrush}"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+
+            <!-- View toggle (image on/off) -->
+            <Style x:Key="ViewToggleStyle" TargetType="ToggleButton" BasedOn="{StaticResource TopBarToggleButton}"/>
+
+        </ResourceDictionary>
+    </Application.Resources>
 </Application>
